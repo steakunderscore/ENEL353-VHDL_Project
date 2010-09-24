@@ -88,11 +88,17 @@ begin
         case f(3 downto 1) is
           when "010" => -- Do NEG operation ( two's complement )
             ro <= ((not rx) + 1);
+            -- TODO: Add the status register output
           when "011" => -- Do CMP operation
             if ( ry > rx ) then
               ro <= ry;
             else
               ro <= rx;
+            end if;
+            if (ro = "00000000") then
+              sr(0) <= '0';
+              sr(1) <= '0';
+              sr(2) <= ro(7); -- This might need to be changed to '0'
             end if;
         end case;
       when others =>
