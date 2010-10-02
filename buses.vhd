@@ -1,6 +1,6 @@
---	Package To Define The Bus Data Types
+--  Package To Define The Bus Data Types
 --
---	Purpose: This package is here to keep all the data types 
+--  Purpose: This package is here to keep all the data types 
 -- standard accross the whole project
 --
 
@@ -16,8 +16,8 @@ package buses is
       req  : std_logic;                     -- Pulled low to request bus usage.
       ack  : std_logic;                     -- Pulled high to inform of request completion.
     end record;
-  
-  
+
+
   type data_bus is
     record
       add  : std_logic_vector(15 downto 0); -- Address lines.
@@ -30,5 +30,5 @@ end buses;
 
 
 package body buses is
-  -- Is empty
-end buses;
+-- Is empty
+  end buses;

@@ -59,7 +59,7 @@ ARCHITECTURE behavior OF testRoutines IS
    signal ry : std_logic_vector(7 downto 0) := (others => '0');
    signal Cin : std_logic := '0';
 
- 	--Outputs
+   --Outputs
    signal ro : std_logic_vector(7 downto 0);
    signal sr : std_logic_vector(2 downto 0);
 
@@ -68,7 +68,7 @@ ARCHITECTURE behavior OF testRoutines IS
  
 BEGIN
  
-	-- Instantiate the Unit Under Test (UUT)
+  -- Instantiate the Unit Under Test (UUT)
    uut: alu PORT MAP (
           clk => clk,
           f => f,
@@ -82,175 +82,175 @@ BEGIN
    -- Clock process definitions
    clk_process :process
    begin
-		clk <= '0';
-		wait for clk_period/2;
-		clk <= '1';
-		wait for clk_period/2;
+    clk <= '0';
+    wait for clk_period/2;
+    clk <= '1';
+    wait for clk_period/2;
    end process;
  
 
    -- Stimulus process
    stim_proc: process
-   begin		
+   begin    
       -- hold reset state for 100 ns.
-      wait for 10 ns;	
+      wait for 10 ns;  
 
       wait for clk_period*2;
 
       -- insert stimulus here
-		f <= "0001";       -- Test AND Function
-		rx <= "01010101";
-		ry <= "10101010";
-		wait for 2 ns;
-		
-		rx <= "00001000";
-		ry <= "00000000";
-		wait for 2 ns;
-		
-		rx <= "11111111";
-		ry <= "00000000";
-		wait for 2 ns;
-		
-		rx <= "00000000";
-		ry <= "11111111";
-		wait for 2 ns;
-				
-		rx <= "11111111";
-		ry <= "11111111";
-		wait for 2 ns;
+    f <= "0001";       -- Test AND Function
+    rx <= "01010101";
+    ry <= "10101010";
+    wait for 2 ns;
+    
+    rx <= "00001000";
+    ry <= "00000000";
+    wait for 2 ns;
+    
+    rx <= "11111111";
+    ry <= "00000000";
+    wait for 2 ns;
+    
+    rx <= "00000000";
+    ry <= "11111111";
+    wait for 2 ns;
+        
+    rx <= "11111111";
+    ry <= "11111111";
+    wait for 2 ns;
 
-		rx <= "11111111";
-		ry <= "11111111";
-		wait for 2 ns;
+    rx <= "11111111";
+    ry <= "11111111";
+    wait for 2 ns;
 
-		rx <= "10101010";
-		ry <= "10101010";
-		wait for 2 ns;
-		
-		rx <= "01010101";
-		ry <= "01010101";
-		wait for 2 ns;
-		
-		f <= "0011";       -- Test OR Function
-		rx <= "01010101";
-		ry <= "10101010";
-		wait for 2 ns;
-		
-		rx <= "00001000";
-		ry <= "00000000";
-		wait for 2 ns;
-		
-		rx <= "11111111";
-		ry <= "00000000";
-		wait for 2 ns;
-		
-		rx <= "00000000";
-		ry <= "11111111";
-		wait for 2 ns;
-				
-		rx <= "11111111";
-		ry <= "11111111";
-		wait for 2 ns;
+    rx <= "10101010";
+    ry <= "10101010";
+    wait for 2 ns;
+    
+    rx <= "01010101";
+    ry <= "01010101";
+    wait for 2 ns;
+    
+    f <= "0011";       -- Test OR Function
+    rx <= "01010101";
+    ry <= "10101010";
+    wait for 2 ns;
+    
+    rx <= "00001000";
+    ry <= "00000000";
+    wait for 2 ns;
+    
+    rx <= "11111111";
+    ry <= "00000000";
+    wait for 2 ns;
+    
+    rx <= "00000000";
+    ry <= "11111111";
+    wait for 2 ns;
+        
+    rx <= "11111111";
+    ry <= "11111111";
+    wait for 2 ns;
 
-		rx <= "11111111";
-		ry <= "11111111";
-		wait for 2 ns;
+    rx <= "11111111";
+    ry <= "11111111";
+    wait for 2 ns;
 
-		rx <= "10101010";
-		ry <= "10101010";
-		wait for 2 ns;
-		
-		rx <= "01010101";
-		ry <= "01010101";
-		wait for 2 ns;
-		
-		f <= "0101";       -- Test NOT Function
-		rx <= "01010101";
-		ry <= "10101010";
-		wait for 2 ns;
-		
-		rx <= "00001000";
-		ry <= "00000000";
-		wait for 2 ns;
-		
-		rx <= "11111111";
-		ry <= "00000000";
-		wait for 2 ns;
-		
-		rx <= "00000000";
-		ry <= "11111111";
-		wait for 2 ns;
-				
-		rx <= "11111111";
-		ry <= "11111111";
-		wait for 2 ns;
+    rx <= "10101010";
+    ry <= "10101010";
+    wait for 2 ns;
+    
+    rx <= "01010101";
+    ry <= "01010101";
+    wait for 2 ns;
+    
+    f <= "0101";       -- Test NOT Function
+    rx <= "01010101";
+    ry <= "10101010";
+    wait for 2 ns;
+    
+    rx <= "00001000";
+    ry <= "00000000";
+    wait for 2 ns;
+    
+    rx <= "11111111";
+    ry <= "00000000";
+    wait for 2 ns;
+    
+    rx <= "00000000";
+    ry <= "11111111";
+    wait for 2 ns;
+        
+    rx <= "11111111";
+    ry <= "11111111";
+    wait for 2 ns;
 
-		rx <= "11111111";
-		ry <= "11111111";
-		wait for 2 ns;
+    rx <= "11111111";
+    ry <= "11111111";
+    wait for 2 ns;
 
-		rx <= "10101010";
-		ry <= "10101010";
-		wait for 2 ns;
-		
-		rx <= "01010101";
-		ry <= "01010101";
-		wait for 2 ns;
-		
-		f <= "0111";       -- Test XOR Function
-		rx <= "01010101";
-		ry <= "10101010";
-		wait for 2 ns;
-		
-		rx <= "00001000";
-		ry <= "00000000";
-		wait for 2 ns;
-		
-		rx <= "11111111";
-		ry <= "00000000";
-		wait for 2 ns;
-		
-		rx <= "00000000";
-		ry <= "11111111";
-		wait for 2 ns;
-				
-		rx <= "11111111";
-		ry <= "11111111";
-		wait for 2 ns;
+    rx <= "10101010";
+    ry <= "10101010";
+    wait for 2 ns;
+    
+    rx <= "01010101";
+    ry <= "01010101";
+    wait for 2 ns;
+    
+    f <= "0111";       -- Test XOR Function
+    rx <= "01010101";
+    ry <= "10101010";
+    wait for 2 ns;
+    
+    rx <= "00001000";
+    ry <= "00000000";
+    wait for 2 ns;
+    
+    rx <= "11111111";
+    ry <= "00000000";
+    wait for 2 ns;
+    
+    rx <= "00000000";
+    ry <= "11111111";
+    wait for 2 ns;
+        
+    rx <= "11111111";
+    ry <= "11111111";
+    wait for 2 ns;
 
-		rx <= "11111111";
-		ry <= "11111111";
-		wait for 2 ns;
+    rx <= "11111111";
+    ry <= "11111111";
+    wait for 2 ns;
 
-		rx <= "10101010";
-		ry <= "10101010";
-		wait for 2 ns;
-		
-		rx <= "01010101";
-		ry <= "01010101";
-		wait for 2 ns;
+    rx <= "10101010";
+    ry <= "10101010";
+    wait for 2 ns;
+    
+    rx <= "01010101";
+    ry <= "01010101";
+    wait for 2 ns;
 
-		
+    
 
       wait;
    end process;
 --
---	process
+--  process
 --     type pattern_type is record
---	    --  The inputs of the adder.
+--      --  The inputs of the adder.
 --       f : bit_vector(3 downto 0);
---		 rx : bit_vector(7 downto 0);
---		 ry : bit_vector(7 downto 0);
+--     rx : bit_vector(7 downto 0);
+--     ry : bit_vector(7 downto 0);
 --       Cin : bit;
 --       --  The expected outputs of the adder.
---		 ro : bit_vector(7 downto 0);
+--     ro : bit_vector(7 downto 0);
 --       sr : bit_vector(2 downto 0);
 --     end record;
 --     --  The patterns to apply.
 --     type pattern_array is array (natural range <>) of pattern_type;
 --       constant patterns : pattern_array :=
 --       --(( f    ,  rx       ,  ry       , Cin,  ro,         sr  ),
---			(("0001", "00000000", "00000000", '0', "00000000", "000"),
+--      (("0001", "00000000", "00000000", '0', "00000000", "000"),
 --          ("0001", "00000000", "00000000", '0', "00000000", "000"),
 --          ("0001", "00000000", "00000000", '0', "00000000", "000"));
 --     begin
@@ -260,7 +260,7 @@ BEGIN
 --          f   <= patterns(i).f;
 --          rx  <= patterns(i).rx;
 --          ry  <= patterns(i).ry;
---			 Cin <= patterns(i).Cin;
+--       Cin <= patterns(i).Cin;
 --          --  Wait for the results.
 --          wait for 1 ns;
 --          --  Check the outputs.
