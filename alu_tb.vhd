@@ -38,7 +38,7 @@ architecture behav of alu_tb is
   type pattern_array is array (natural range <>) of pattern_type;
   constant patterns : pattern_array :=
   -- f       rx          ry          ro         Cin   sr
-  (("0001", "00000000", "00000000", "00000000", '0', "001"), --AND tests
+  (("0001", "00000000", "00000000", "00010000", '0', "001"), --AND tests
    ("0001", "00000000", "00000000", "00000000", '0', "100"), --AND tests
    ("0001", "00000000", "00000000", "00000000", '0', "000"));--AND tests
 begin
