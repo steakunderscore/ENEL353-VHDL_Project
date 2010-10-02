@@ -1,12 +1,13 @@
 library work;
+use work.buses;
 use work.cpu.cpu;
 use work.mmu.mmu;
-use work.io.io; 
+use work.io.io;
 
 architecture everything_arch of everything is
   signal clk      : std_logic;
-  signal data_bus : ;
-  signal inst_bus : ;
+  signal data_bus : buses.data_bus;
+  signal inst_bus : buses.inst_bus;
   
   begin
     entity cpu(cpu_arch)
