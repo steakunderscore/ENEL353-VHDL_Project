@@ -31,6 +31,10 @@ use work.buses.ALL;
 --use UNISIM.VComponents.all;
 
 entity IO is
+       PORT(
+            data_bus	:INOUT	buses.data_bus
+		)
+			
 end IO;
 
 architecture Behavioral of IO is
