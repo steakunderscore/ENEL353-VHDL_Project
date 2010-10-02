@@ -9,28 +9,26 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
 package buses is
-
-  
-  type instruction is
+  type inst_bus is
     record
-        opcode             : std_logic_vector( 5 downto 0);
-		  operand            : std_logic_vector( 9 downto 0);
+      add  : std_logic_vector(15 downto 0); -- Address lines.
+      data : std_logic_vector(15 downto 0); -- Data lines.
+      req  : std_logic;                     -- Pulled low to request bus usage.
+      ack  : std_logic;                     -- Pulled high to inform of request completion.
     end record;
-
--- Declare constants
-
-  constant instructionLength  : integer := 16;
-  constant opcodeLength       : integer := 6;
-  constant operandLength      : integer := 10;
-   
--- Declare functions and procedure
-
-  --function <function_name>  (signal <signal_name> : in <type_ declaration>) return <type_declaration>;
-  --procedure <procedure_name>	(<type_declaration> <constant_name>	: in <type_declaration>);
-
+  
+  
+  type data_bus is
+    record
+      add  : std_logic_vector(15 downto 0); -- Address lines.
+      data : std_logic_vector(7 downto 0);  -- Data lines.
+      red  : std_logic;                     -- High for a read request, low for a write request.
+      req  : std_logic;                     -- Pulled low to request bus usage.
+      ack  : std_logic;                     -- Pulled high to inform of request completion.
+    end record;
 end buses;
 
 
 package body buses is
-  -- Is emtpy
+  -- Is empty
 end buses;
