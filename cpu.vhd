@@ -19,8 +19,8 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+--use IEEE.STD_LOGIC_ARITH.ALL;
+--use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
 use work.buses.ALL;
@@ -35,7 +35,7 @@ entity cpu is
   PORT(
     clk            : IN std_logic;
     Rinsel         : IN std_logic_vector(2 DOWNTO 0); -- Which register to write
-	 Routsel        : IN std_logic_vector(2 DOWNTO 0); -- Which register to read
+    Routsel        : IN std_logic_vector(2 DOWNTO 0); -- Which register to read
     read, write    : IN std_logic; -- Flags for read or write control
     Rin            : IN std_logic_vector(7 DOWNTO 0); -- Input signals
     Rout           : OUT std_logic_vector(7 DOWNTO 0)); -- Output signals
@@ -81,7 +81,7 @@ begin
         WHEN "101" => Rout <= reg5;
         WHEN "110" => Rout <= reg6;
         WHEN "111" => Rout <= reg7;
-        --WHEN OTHERS => Rout <= "XXXXXXXXXXXXXXXXXXXXXX";
+        WHEN OTHERS => NULL;
       END CASE;
     END IF;
   END PROCESS;

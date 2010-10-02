@@ -21,11 +21,11 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
+--use ieee.std_logic_unsigned.all;
 
 
 library work;
-use work.cpuLib.ALL;
+--use work.cpu.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -37,8 +37,7 @@ use work.cpuLib.ALL;
 --use UNISIM.VComponents.all;
 
 entity alu is
-   Port (clk : in   STD_LOGIC;                      -- Clock
-         f   : in   STD_LOGIC_VECTOR (3 downto 0);  -- Function (opcode)
+   Port (f   : in   STD_LOGIC_VECTOR (3 downto 0);  -- Function (opcode)
          rx  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input x (Rx)
          ry  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input y (Ry)
          ro  : out  STD_LOGIC_VECTOR (7 downto 0);  -- Output Normaly (Ry)
