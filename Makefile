@@ -9,8 +9,10 @@ GHDLFLAGS= --ieee=mentor
 # Default target
 all: alu_tb alu busses cpu IO microprocessor mmu
 
+.PHONY: clean
+
 clean:
-	rm *.o
+	rm -f *.o
 
 # Elaboration target
 alu_tb: alu.o alu_tb.o
@@ -33,10 +35,6 @@ microprocessor: microprocessor.o
 
 mmu: mmu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
-
-# Run target
-run: alu_tb
-	$(GHDL) -r alu_tb $(GHDLRUNFLAGS)
 
 # Targets to analyze files
 alu_tb.o: alu_tb.vhd alu.o
