@@ -3,11 +3,11 @@
 # Command used to generate this makefile:
 # /usr/lib/ghdl/bin/ghdl --gen-makefile --ieee=mentor alu_tb
 
-GHDL=`which ghdl`
+GHDL=ghdl
 GHDLFLAGS= --ieee=mentor
 
 # Default target
-all: alu_tb alu busses cpu IO microprocessor mmu
+all: alu_tb alu buses cpu IO microprocessor mmu
 
 .PHONY: clean
 
@@ -21,7 +21,7 @@ alu_tb: alu.o alu_tb.o
 alu: alu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
-busses: buses.o
+buses: buses.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 cpu: cpu.o
@@ -43,7 +43,7 @@ alu_tb.o: alu_tb.vhd alu.o
 alu.o: alu.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-busses.o: buses.vhd
+buses.o: buses.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 cpu.o: cpu.vhd
