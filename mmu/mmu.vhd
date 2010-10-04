@@ -47,13 +47,8 @@ architecture mmu_arch of mmu is
       case inst_state is
         when idle =>
           if (rising_edge(clk) and inst_bus.req = '0') then
-            inst_state <= read_add;
+            inst_state <= get_data;
           end if;
-        
-        when read_add =>
-          inst_address <= inst_bus.add;
-          inst_bus.ack <= '1';
-          inst_state <= get_data;
         
         when get_data =>
           inst_bus.data <= --incoming data;
@@ -62,6 +57,7 @@ architecture mmu_arch of mmu is
         
         when wait_clear =>
           if (rising_edge(clk) and inst_bus.req = '1') then
+            inst_bus.ack <= '1';
             inst_state <= idle;
           end if;
       end case;
@@ -92,7 +88,7 @@ architecture mmu_arch of mmu is
         
         when get_data =>
           data_bus.data <= --incoming data;
-          data_bus.ack <= '1';
+          data_bus.ack <= '0';
           data_state <= wait_data;
         
         when write_add =>
@@ -102,11 +98,12 @@ architecture mmu_arch of mmu is
         
         when put_data =>
           -- put data
-          data_bus.ack <= '1'
+          data_bus.ack <= '0'
           data_state <= wait_clear
         
         when wait_clear =>
           if (rising_edge(clk) and inst_bus.req = '1') then
+            data_bus.ack <= '1'
             data_state <= idle;
           end if;
       end case;
