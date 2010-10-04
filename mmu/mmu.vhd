@@ -33,7 +33,7 @@ entity mmu is
 end mmu;
 
 architecture mmu_arch of mmu is
-  type state is (idle, check_add, read_add, get_data, write_add, put_data, wait_clear);
+  type state is (idle, check_add, get_data, put_data, wait_clear);
   
   signal inst_state : state := idle;
   signal inst_address : std_logic_vector( 11 downto 0 );
@@ -74,32 +74,23 @@ architecture mmu_arch of mmu is
         when check_add =>
           if (rising_edge(clk) and data_bus.req = '0' and data_bus.address(0) = '1') then
             if data_bus.red = '1' then
-              data_state <= read_add;
+              data_state <= get_data;
             else
-              data_state <= write_add;
+              data_state <= put_data;
             end if;
           else
             data_state <= idle;
           end if;
         
-        when read_add =>
-          data_address <= data_bus.add;
-          data_state <= get_data;
-        
         when get_data =>
           data_bus.data <= --incoming data;
           data_bus.ack <= '0';
-          data_state <= wait_data;
-        
-        when write_add =>
-          data_address <= data_bus.add;
-          data_data <= data_bus.data;
-          data_state <= put_data;
+          data_state <= wait_clear;
         
         when put_data =>
-          -- put data
-          data_bus.ack <= '0'
-          data_state <= wait_clear
+          -- put data 
+          data_bus.ack <= '0';
+          data_state <= wait_clear;
         
         when wait_clear =>
           if (rising_edge(clk) and inst_bus.req = '1') then
