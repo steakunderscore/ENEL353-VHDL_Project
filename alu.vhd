@@ -104,25 +104,25 @@ BEGIN
           when others =>
             output := (others => '0');
         end case;
-      --    when '0' => -- Non arithmetic or locic
-      --        case f(3 downto 1) is
-      --          when "010" => -- Do NEG operation ( two's complement )
-      --            output <= ((not rx) + 1);
-      --            -- TODO: Add the status register output
-      --          when "011" => -- Do CMP operation
-      --            if ( ry > rx ) then
-      --              output <= ry;
-      --            else
-      --              output <= rx;
-      --            end if;
-      ----            if (output = "00000000") then
-      ----              Z := '0';
-      ----              C := '0';
-      ----              N := output(7); -- This might need to be changed to '0'
-      ----            end if;
-      --          when others =>
-      --         output => (others => '0');
-      --        end case;
+      when '0' => -- Non arithmetic or locic
+        case f(3 downto 1) is
+          when "010" => -- Do NEG operation ( two's complement )
+            output := ((not rx) + "00000001");
+            -- TODO: Add the status register output
+          when "011" => -- Do CMP operation
+            if ( ry > rx ) then
+              output := ry;
+            else
+              output := rx;
+            end if;
+            if (output = "00000000") then
+              Z := '0';
+            end if;
+            C := '0';
+            N := output(7); -- This might need to be changed to '0'
+          when others =>
+            output := (others => '0');
+        end case;
       when others =>
         output := (others => '0');
     end case;  --  f(0)
