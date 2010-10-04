@@ -30,10 +30,14 @@ entity mmu is
     clk      : in    std_logic;
     data_bus : inout buses.data_bus;
     inst_bus : inout buses.inst_bus;
+    recieve_pin : in std_logic;
+    transfer_pin : out std_logic;
+  )
 end mmu;
 
 architecture mmu_arch of mmu is
   type state is (idle, check_add, get_data, put_data, wait_clear);
+
   
   signal inst_state : state := idle;
   signal inst_address : std_logic_vector( 11 downto 0 );
@@ -42,6 +46,18 @@ architecture mmu_arch of mmu is
   signal data_address : std_logic_vector( 15 downto 0 );
   
   begin
+    muart : minimal_uart_core port map (
+      clock <= clk,
+      eoc   <= end_of_collection,
+      outp  <= muart_out,
+      rxd   <= recieve_pin,
+      txd   <= transfer_pin,
+      eot   <= end_of_transmission,
+      inp   <= muart_in,
+      ready <= ready,
+      wr    <= write
+    );
+
     inst_fsm : process(inst_state, inst_bus.req, clk)
     begin
       case inst_state is
