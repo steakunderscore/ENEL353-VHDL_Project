@@ -50,7 +50,7 @@ architecture principal of br_generator is
   -- one hz equal to one bit per second
   signal   count_brg     : std_logic_vector(divider_width - 1 downto 0) := (others => '0');
   signal   count_brg_txd : std_logic_vector(divider_width - 1 downto 0) := (others => '0');
-  constant brdvd         : std_logic_vector(divider_width - 1 downto 0) := x"015b"; -- 15b@115200, 40mhz 8235@1200, 1046a 600bps, 824@19200bps
+  constant brdvd         : std_logic_vector(divider_width - 1 downto 0) := x"0516"; -- 38400 bps @ 50MHz
 
   begin
     txd : process (clock)
