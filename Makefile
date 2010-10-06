@@ -37,16 +37,16 @@ mmu: mmu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 # Targets to analyze files
-alu_tb.o: alu_tb.vhd alu.o
+alu_tb.o: processor/alu_tb.vhd alu.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-alu.o: alu.vhd
+alu.o: processor/alu.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 buses.o: buses.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-cpu.o: cpu.vhd
+cpu.o: processor/cpu.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 IO.o: IO.vhd
