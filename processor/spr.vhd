@@ -8,8 +8,8 @@
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
--- Description: 
---
+-- Description: The Special Purpose Register is 3, 16bit registers. One for the PC,
+-- another for the SR and the third is the IR.
 -- Dependencies: 
 --
 -- Revision: 
@@ -45,10 +45,39 @@ end spr;
 
 
 architecture Behavioral of spr is
+  signal  Rpc    : std_logic_vector(15 downto 0);
+  signal  Rsr    : std_logic_vector(15 downto 0);
+  signal  Rir    : std_logic_vector(15 downto 0);
 BEGIN
-  process()
+  process(clk, enable, SelR, Ri)
   BEGIN
-
+    IF (rising_edge(clk)) THEN
+      IF (enable = '1') THEN
+        IF (read = '1') THEN
+          CASE SelR IS
+            when "00" =>
+              Ro <= Rpc;
+            when "01" =>
+              Ro <= Rsr;
+            when "10" =>
+              Ro <= Rir;
+            when others =>
+              Ro <= (others => '0');
+          END CASE;
+        ELSE -- not read (write)
+          CASE SelR IS
+            when "00" =>
+              Rpc <= Ri;
+            when "01" =>
+              Rsr <= Ri;
+            when "10" =>
+              Rir <= Ri;
+            when others =>
+              NULL;
+          END CASE;
+        END IF;
+      END IF;
+    END IF;
   end process;
 end Behavioral;
 
