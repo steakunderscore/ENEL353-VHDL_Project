@@ -28,14 +28,16 @@ ENTITY switch_reg IS
 PORT( D : IN STD_LOGIC;
       reset, clk : IN STD_LOGIC;
       Q : OUT STD_LOGIC);
+END switch_reg;
 
 ARCHITECTURE reg_arch OF switch_reg IS
 BEGIN
      PROCESS(D, reset, clk)
+	  BEGIN
             IF reset = '1' THEN
-               Q <= (OTHERS => '0');
+               Q <= '0';
             ELSIF rising_edge(clk) THEN
-                  Q <= D;
+               Q <= D;
             END IF;
      END PROCESS;
 END reg_arch;
