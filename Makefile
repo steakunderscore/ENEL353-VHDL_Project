@@ -21,6 +21,12 @@ alu_tb: alu.o alu_tb.o
 alu: alu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
+gpr_tb: gpr.o gpr_tb.o
+	$(GHDL) -e $(GHDLFLAGS) $@
+
+gpr: gpr.o
+	$(GHDL) -e $(GHDLFLAGS) $@
+
 buses: buses.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
@@ -41,6 +47,12 @@ alu_tb.o: processor/alu_tb.vhd alu.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 alu.o: processor/alu.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+gpr_tb.o: processor/gpr_tb.vhd gpr.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+gpr.o: processor/gpr.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 buses.o: buses.vhd

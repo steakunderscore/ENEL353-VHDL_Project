@@ -102,29 +102,31 @@ BEGIN
     END IF;
   end process;
 
-  process(clk, SelRi)
+  process(clk, SelRi, enable)
   BEGIN
     IF (rising_edge(clk)) THEN
-      CASE SelRi IS
-        when "000" =>
-          R0 <= Ri;
-        when "001" =>
-          R1 <= Ri;
-        when "010" =>
-          R2 <= Ri;
-        when "011" =>
-          R3 <= Ri;
-        when "100" =>
-          R4 <= Ri;
-        when "101" =>
-          R5 <= Ri;
-        when "110" =>
-          R6 <= Ri;
-        when "111" =>
-          R7 <= Ri;
-        when others =>
-          NULL;
-      END CASE;
+      IF enable = '1' THEN
+        CASE SelRi IS
+          when "000" =>
+            R0 <= Ri;
+          when "001" =>
+            R1 <= Ri;
+          when "010" =>
+            R2 <= Ri;
+          when "011" =>
+            R3 <= Ri;
+          when "100" =>
+            R4 <= Ri;
+          when "101" =>
+            R5 <= Ri;
+          when "110" =>
+            R6 <= Ri;
+          when "111" =>
+            R7 <= Ri;
+          when others =>
+            NULL;
+        END CASE;
+      END IF;
     END IF;
   end process;
 end Behavioral;
