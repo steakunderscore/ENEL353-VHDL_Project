@@ -37,7 +37,7 @@ library work;
 entity spr is
   Port (clk      : in   STD_LOGIC;
         enable   : in   STD_LOGIC;
-        read     : in   STD_LOGIC;                       -- (not write)
+        read     : in   STD_LOGIC;                       -- Read/Write or Read-only
         SelR     : in   STD_LOGIC_VECTOR (1 downto 0);   -- PC(0) SR(1) IR(2)
         Ri       : in   STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SPR
         Ro       : out  STD_LOGIC_VECTOR (15 downto 0)); -- The output from SPR
@@ -53,18 +53,7 @@ BEGIN
   BEGIN
     IF (rising_edge(clk)) THEN
       IF (enable = '1') THEN
-        IF (read = '1') THEN
-          CASE SelR IS
-            when "00" =>
-              Ro <= Rpc;
-            when "01" =>
-              Ro <= Rsr;
-            when "10" =>
-              Ro <= Rir;
-            when others =>
-              Ro <= (others => '0');
-          END CASE;
-        ELSE -- not read (write)
+        IF (read = '0') THEN  --Only write when Read/Write mode
           CASE SelR IS
             when "00" =>
               Rpc <= Ri;
@@ -76,6 +65,17 @@ BEGIN
               NULL;
           END CASE;
         END IF;
+
+        CASE SelR IS  --Read in both Read/Write and Read-only modes
+          when "00" =>
+            Ro <= Rpc;
+          when "01" =>
+            Ro <= Rsr;
+          when "10" =>
+            Ro <= Rir;
+          when others =>
+            Ro <= (others => '0');
+        END CASE;
       END IF;
     END IF;
   end process;
