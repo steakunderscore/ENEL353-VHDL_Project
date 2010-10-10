@@ -31,7 +31,7 @@ ENTITY debounce IS
 END debounce;
 
 ARCHITECTURE debounced_switch OF debounce IS
-             SIGNAL count : STD_LOGIC_VECTOR(1 DOWNTO 0);  --variable or signal???
+             SIGNAL count : STD_LOGIC_VECTOR(2 DOWNTO 0);  --variable or signal???
 BEGIN
      PROCESS(clk)
      BEGIN
@@ -43,9 +43,9 @@ BEGIN
                 END IF;
           END IF;
           IF count = "111" AND switch = '1' THEN
-             switch_state = '1';
+             switch_state <= '1';
           ELSE
-              switch_state = '0';
+              switch_state <= '0';
           END IF;
      END PROCESS;
 END debounced_switch;
