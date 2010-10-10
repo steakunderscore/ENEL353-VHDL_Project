@@ -39,11 +39,8 @@ entity IO is
             data_bus    : INOUT buses.data_bus;
             clk         : IN std_logic;
             sw1         : IN std_logic;
-            sw2         : IN std_logic;
+            sw2         : IN std_logic);
             --leds      : OUT std_logic_vector(7 DOWNTO 0);
-
-    );
-
 end IO;
 
 architecture Behavioral of IO is
@@ -65,7 +62,7 @@ COMPONENT switch_reg
 END COMPONENT;
 
 BEGIN
-sw1_status: switch_reg PORT MAP(switch1_connection,-!!-, clk, switch1_output);
+sw1_status: switch_reg PORT MAP(switch1_connection,clk, clk, switch1_output); --!! reset --
 sw1_debouncer: debounce PORT MAP(clk, sw1,switch1_connection);
      PROCESS(clk, data_bus)
      BEGIN
