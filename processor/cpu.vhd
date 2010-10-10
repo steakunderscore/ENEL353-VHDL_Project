@@ -4,7 +4,7 @@
 -- 
 -- Create Date:    16:09:46 09/15/2010 
 -- Design Name: 
--- Module Name:    cpu - Behavioral 
+-- Module Name:    cpu - cpu_arch 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -33,24 +33,50 @@ use work.buses.ALL;
 entity cpu is
 
   PORT( --TODO: Change these to the actual port map
-    clk            : IN std_logic;
-    Rinsel         : IN std_logic_vector(2 DOWNTO 0); -- Which register to write
-    Routsel        : IN std_logic_vector(2 DOWNTO 0); -- Which register to read
-    read, write    : IN std_logic; -- Flags for read or write control
-    Rin            : IN std_logic_vector(7 DOWNTO 0); -- Input signals
-    Rout           : OUT std_logic_vector(7 DOWNTO 0)); -- Output signals
+    --should be the busses and clk only
+    clk            : IN std_logic);
 
 end cpu;
 
-architecture Behavioral of cpu is
-
-SIGNAL reg0, reg1, reg2, reg3, reg4, reg5, reg6, reg7 : std_logic_vector(7 DOWNTO 0);
-
+architecture cpu_arch of cpu is
 begin
 
-  -- WRITE PROCESS: To write to the registers
-  PROCESS (clk, write, Rinsel)
-  BEGIN
-  END PROCESS;
-
-end Behavioral;
+    entity alu(alu_arch)
+      port map(
+        f
+        rx
+        ry
+        ro
+        Cin
+        sr
+      );
+    entity ar(alu_arch)
+      port map(
+        clk => clk,
+        enable
+        read
+        SelR
+        Ri
+        Ro
+      );
+    entity gpr(alu_arch)
+      port map(
+        clk => clk,
+        enable
+        SelRx
+        SelRy
+        SelRi
+        Ri
+        Rx
+        Ry
+      );
+    entity spr(alu_arch)
+      port map(
+        clk => clk,
+        enable
+        read
+        SelR
+        Ri
+        Ro
+      );
+end cpu_arch;
