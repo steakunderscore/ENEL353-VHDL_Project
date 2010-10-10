@@ -1,0 +1,14 @@
+net "led_state<0>" loc = "p11";
+net "led_state<1>" loc = "p12";
+net "led_state<2>" loc = "n12";
+net "led_state<3>" loc = "p13";
+net "led_state<4>" loc = "n14";
+net "led_state<5>" loc = "l12";
+net "led_state<6>" loc = "p14";
+net "led_state<7>" loc = "k12";
+
+net "sw1" loc = "m13";
+net "sw2" loc = "m14";
+
+net "ss1" loc = "f12";
+net "ss2" loc = "g12";
