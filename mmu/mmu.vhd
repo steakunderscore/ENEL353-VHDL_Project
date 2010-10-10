@@ -4,6 +4,11 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
+use work.mmu.control_unit;
+use work.mmu.control_in_type;
+use work.mmu.control_out_type;
+use work.mmu.header_builder;
+use work.mmu.header_decoder;
 
 package mmu is
   entity mmu is
@@ -16,7 +21,7 @@ package mmu is
       -- data bus
       data_add  : in    std_logic_vector(15 downto 0); -- Address lines.
       data_data : inout std_logic_vector(7 downto 0);  -- Data lines.
-      data_red  : in    std_logic;                     -- High for a read request, low for a write request.
+      data_read : in    std_logic;                     -- High for a read request, low for a write request.
       data_req  : in    std_logic;                     -- Pulled low to request bus usage.
       data_ack  : inout std_logic;                     -- Pulled high to inform of request completion.
       -- extras
@@ -33,6 +38,14 @@ package mmu is
     signal control_out : control_out_type;
     signal header_in   : std_logic_vector(7 downto 0);
     signal header_out  : std_logic_vector(7 downto 0);
+
+    control_in.data_add_0 <= data_add(0);
+    control_in.data_read  <= data_read;
+    control_in.data_req   <= data_req;
+    control_in.inst_req   <= inst_req;
+
+    inst_ack <= control_in.inst_ack;
+    data_ack <= control_in.data_ack;
 
     begin
       muart : minimal_uart_core port map (
