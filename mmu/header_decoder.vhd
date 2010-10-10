@@ -14,11 +14,12 @@ entity header_decoder is
     inst_data     : out  std_logic; -- 1 = inst, 0 = data
     header        : in std_logic_vector(7 downto 0)
   );
-end mmu;
+end header_decoder;
 
 architecture header_decoder_arch of header_decoder is
+begin
   read_write <= header(7); -- reading or writing? (should be 1 in this case)
   fetch_request <= header(1); -- fetch request? (should be 1n this case)
   inst_data <= header(0); -- instruction data or data data?
-end mmu_arch;
+end header_decoder_arch;
 

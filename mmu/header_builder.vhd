@@ -13,10 +13,11 @@ entity header_builder is
     inst_data  : in  std_logic; -- 1 = inst, 0 = data
     header     : out std_logic_vector(7 downto 0)
   );
-end mmu;
+end header_builder;
 
 architecture header_builder_arch of header_builder is
-  header(7) <= header_rw and not(inst_data); -- reading from or writing to
+begin
+  header(7) <= read_write and not(inst_data); -- reading from or writing to
                                              -- memory? (can't write
                                              -- instructions)
   header(6) <= '0'; -- reserved
@@ -26,5 +27,5 @@ architecture header_builder_arch of header_builder is
   header(2) <= '0'; -- diagnostic;
   header(1) <= '0'; --  1 if data is being retrieved from RS-232 link
   header(0) <= inst_data; -- instruction data or data data?
-end mmu_arch;
+end header_builder_arch;
 
