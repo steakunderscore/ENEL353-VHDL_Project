@@ -38,7 +38,7 @@ entity decod is
     clock   : in  std_logic;
     eot     : in  std_logic;
     data    : in  std_logic_vector (7 downto 0);
-    wr      : out std_logic
+    wr      : out std_logic;
     segment : out std_logic_vector (7 downto 0);
     outp    : out std_logic_vector (7 downto 0);
   );

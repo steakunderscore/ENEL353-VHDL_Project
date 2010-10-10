@@ -1,20 +1,20 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
+-- Company:
+-- Engineer:
+--
 -- Create Date:    16:09:00 09/15/2010 
--- Design Name: 
--- Module Name:    mmu - Behavioral 
+-- Design Name:
+-- Module Name:    mmu - Behavioral
 -- Project Name: 
--- Target Devices: 
+-- Target Devices:
 -- Tool versions: 
--- Description: 
+-- Description:
 --
 -- Dependencies: 
 --
--- Revision: 
+-- Revision:
 -- Revision 0.01 - File Created
--- Additional Comments: 
+-- Additional Comments:
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -23,7 +23,26 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
-use work.buses;
+--use work.buses;
+--
+--type inst_bus is
+--    record
+--      add  : std_logic_vector(11 downto 0); -- Address lines.
+--      data : std_logic_vector(15 downto 0); -- Data lines.
+--      req  : std_logic;                     -- Pulled low to request bus usage.
+--      ack  : std_logic;                     -- Pulled high to inform of request completion.
+--    end record;
+--
+--
+--  type data_bus is
+--    record
+--      add  : std_logic_vector(15 downto 0); -- Address lines.
+--      data : std_logic_vector(7 downto 0);  -- Data lines.
+--      red  : std_logic;                     -- High for a read request, low for a write request.
+--      req  : std_logic;                     -- Pulled low to request bus usage.
+--      ack  : std_logic;                     -- Pulled high to inform of request completion.
+--    end record;
+
 
 entity mmu is
   port (
@@ -38,7 +57,20 @@ end mmu;
 architecture mmu_arch of mmu is
   type state is (idle, check_add, get_data, put_data, wait_clear);
 
-  
+  -- instruction bus
+  signal inst_add  : std_logic_vector(11 downto 0); -- Address lines.
+  signal inst_data : std_logic_vector(15 downto 0); -- Data lines.
+  signal inst_req  : std_logic;                     -- Pulled low to request bus usage.
+  signal inst_ack  : std_logic;                     -- Pulled high to inform of request completion.
+
+  -- data bus
+  signal data_add  : std_logic_vector(15 downto 0); -- Address lines.
+  signal data_data : std_logic_vector(7 downto 0);  -- Data lines.
+  signal data_red  : std_logic;                     -- High for a read request, low for a write request.
+  signal data_req  : std_logic;                     -- Pulled low to request bus usage.
+  signal data_ack  : std_logic;                     -- Pulled high to inform of request completion.
+
+  -- internal stuff
   signal inst_state : state := idle;
   signal inst_address : std_logic_vector( 11 downto 0 );
   signal data_state : state := idle;
@@ -86,7 +118,7 @@ architecture mmu_arch of mmu is
           if (rising_edge(clk) and data_bus.req = '0') then
             data_state <= check_add;
           end if;
-        
+
         when check_add =>
           if (rising_edge(clk) and data_bus.req = '0' and data_bus.address(0) = '1') then
             if data_bus.red = '1' then
@@ -104,7 +136,7 @@ architecture mmu_arch of mmu is
           data_state <= wait_clear;
         
         when put_data =>
-          -- put data 
+          -- put data
           data_bus.ack <= '0';
           data_state <= wait_clear;
         
