@@ -1,0 +1,3 @@
+net "clk"  loc = "m6"  ;
+net "rx"   loc = "T13";
+net "tx"   loc = "R13";

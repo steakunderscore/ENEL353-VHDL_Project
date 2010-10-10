@@ -29,15 +29,15 @@
 --*                                                                       *
 --*************************************************************************
 
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity minimal_uart_core is
   port(
     clock : in    std_logic;
     eoc   : out   std_logic;
-    outp  : inout std_logic_vector(7 downto 0) := "zzzzzzzz";
+    outp  : inout std_logic_vector(7 downto 0) := "ZZZZZZZZ";
     rxd   : in    std_logic;
     txd   : out   std_logic;
     eot   : out   std_logic;

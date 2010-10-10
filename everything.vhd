@@ -1,30 +1,27 @@
 library work;
-use work.buses;
-use work.cpu.cpu;
-use work.mmu.mmu;
-use work.io.io;
+use work.cpu;
+use work.mmu;
+use work.io;
+
+entity everything is
+  port (
+    clk : in std_logic;
+	 tx  : out std_logic;
+	 rx  : in std_logic
+  )
+end everything;
 
 architecture everything_arch of everything is
   signal clk      : std_logic;
-  signal data_bus : buses.data_bus;
-  signal inst_bus : buses.inst_bus;
   
   begin
-    entity cpu(cpu_arch)
-      port map(
-        clk => clk,
-        data_bus => data_bus,
-        inst_bus => inst_bus
+    c : cpu port map(
+        clk => clk
       );
-    entity mmu(mmu_arch)
-      port map(
-        clk => clk,
-        data_bus => data_bus,
-        inst_bus => inst_bus
+    m : mmu port map(
+        clk => clk
       );
-    entity io(io_arch)
-      port map(
-        clk => clk,
-        data_bus => data_bus
+    i : io  port map(
+        clk => clk
       );
-end architecture everything_arch
+end architecture everything_arch;

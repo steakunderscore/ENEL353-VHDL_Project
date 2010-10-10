@@ -3,9 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-library work;
-
-package mmu is
+package mmu_control_types is
   type control_in_type is record
     eoc          : std_logic; -- High on muart has finished collecting data ??
     eot          : std_logic; -- High on muart has finished transmitting data.
@@ -23,22 +21,31 @@ package mmu is
     inst_or_data : std_logic; -- High if current output packet is an instruction packet.
     inst_ack     : std_logic; -- Low when the inst is ready to be read by CPU. High otherwise.
     data_ack     : std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
-    input_multi  : std_logic_vector
   end record;
+end mmu_control_types;
 
-  entity control_unit is
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+library work;
+use work.mmu_control_types.control_in_type;
+use work.mmu_control_types.control_out_type;
+
+  entity mmu_control_unit is
     port (
       input  : in  control_in_type;
       output : out control_out_type;
-      clk    : in  std_logic;
-    )
-  end control_unit;
+      clk    : in  std_logic
+    );
+  end mmu_control_unit;
 
-  architecture control_unit_arch of control_unit is
+  architecture mmu_control_unit_arch of mmu_control_unit is
     type state is (idle, get_data, put_data, wait_clear);
     signal inst_state : state := idle;
     signal data_state : state := idle;
-
+  begin
     inst_fsm : process(inst_state, input.inst_req, clk) begin
       if (rising_edge(clk)) then
         case inst_state is
@@ -49,7 +56,7 @@ package mmu is
           
           when get_data =>
             -- get data;
-            ouput.inst_ack <= '0';
+            output.inst_ack <= '0';
             inst_state <= wait_clear;
           
           when wait_clear =>
@@ -66,7 +73,7 @@ package mmu is
     end process inst_fsm;
     
     data_fsm : process(data_state, input.data_req, clk) begin
-      if (rising_edge(clk)
+      if (rising_edge(clk)) then
         case data_state is
           when idle =>
             if (input.data_req = '0' and input.data_add_0 = '1') then
@@ -91,11 +98,10 @@ package mmu is
           
           when wait_clear =>
             if (input.data_req = '1') then
-              output.data_ack <= 'z'
+              output.data_ack <= 'Z';
               data_state <= idle;
             end if;
         end case;
       end if;
     end process data_fsm;
-  end control_unit_arch;
-end mmu;
+  end mmu_control_unit_arch;

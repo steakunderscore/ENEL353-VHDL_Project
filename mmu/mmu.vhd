@@ -4,13 +4,12 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
-use work.mmu.control_unit;
-use work.mmu.control_in_type;
-use work.mmu.control_out_type;
-use work.mmu.header_builder;
-use work.mmu.header_decoder;
+use work.mmu_control_unit;
+use work.mmu_control_types.control_in_type;
+use work.mmu_control_types.control_out_type;
+use work.header_builder;
+use work.header_decoder;
 
-package mmu is
   entity mmu is
     port (
       -- instruction bus
@@ -60,7 +59,7 @@ package mmu is
         wr    <= control_out.write
       );
 
-      cu : control_unit port map (
+      cu : mmu_control_unit port map (
         input  <= control_in,
         output <= control_out,
         clk    <= clk
@@ -78,4 +77,3 @@ package mmu is
         header    <= header_in
       );
   end mmu_arch;
-end mmu;
