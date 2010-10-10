@@ -32,15 +32,59 @@ use work.buses.ALL;
 
 entity IO is
        PORT(
-            data_bus  :INOUT  buses.data_bus
-    )
+            data_bus	: INOUT buses.data_bus;
+		clk	: IN std_logic;
+		sw1	: IN std_logic;
+		sw2	: IN std_logic;
+		leds	: OUT std_logic_vector(7 DOWNTO 0);
+			
+    );
 
 end IO;
 
 architecture Behavioral of IO is
 
-begin
+signal data_data	: std_logic_vector(7 DOWNTO 0);
+signal data_address	: std_logic_vector( 15 DOWNTO 0 );
+signal read		: std_logic;
+signal request		: std_logic;
+signal ack		: std_logic;
 
+BEGIN
+	PROCESS(clk, data_bus, leds) -- process of read data from the CPU and display LEDS
+	BEGIN
+	IF rising_edge(clk) THEN
+		IF request = '0' AND data_address(0) = '1' THEN
+			CASE data_address IS
+			  WHEN "0001" => leds(0) <= data_data(0);
+			  WHEN "0011" => leds(1) <= data_data(1);
+			  WHEN "0101" => leds(2) <= data_data(2);
+			  WHEN "0111" => leds(3) <= data_data(3);
+			  WHEN "1001" => leds(4) <= data_data(4);
+			  WHEN "1011" => leds(5) <= data_data(5);
+			  WHEN "1101" => leds(6) <= data_data(6);
+			  WHEN "1111" => leds(7) <= data_data(7);
+			  WHEN OTHERS => NULL;
+			END CASE;
+			data_bus.ack <= '0';
+		END IF; -- do I need an ELSE clause to tell it to wait a cycle and detect again ???
+			-- can the leds represented as std_logic_vectors ???
+			-- have to have a flip-flop per led ? how are they represented ???
+	END IF;
+	END PROCESS;
+	
+	PROCESS(clk,data_bus, sw1, sw2)
+	BEGIN
+	IF rising_edge(clk) THEN
+		read <= '0';
+		IF sw1 = '1' AND request = '1' THEN
+			data_bus.data = '01010101';
+		ELSIF sw2 = '1' AND request = '1' THEN
+			data_bus.data = '10101010';
+		END IF;
+		data_bus.ack <= '1';
+	END IF;
+	END PROCESS;			
 
-end Behavioral;
+END Behavioral;
 
