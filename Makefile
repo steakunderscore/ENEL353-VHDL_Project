@@ -55,7 +55,7 @@ spr: spr.o
 alu_tb.o: processor/alu_tb.vhd alu.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-alu.o: processor/alu.vhd
+alu.o: processor/alu.vhd numeric_std.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 buses.o: buses.vhd
@@ -71,6 +71,9 @@ gpr.o: processor/gpr.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 IO.o: IO.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+numeric_std.o: processor/numeric_std.vhdl
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 microprocessor.o: microprocessor.vhd

@@ -19,12 +19,12 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_arith.all;
 --use ieee.std_logic_unsigned.all;
 
 
 library work;
+use WORK.NUMERIC_STD.ALL;
 --use work.cpu.ALL;
 
 -- Uncomment the following library declaration if using
