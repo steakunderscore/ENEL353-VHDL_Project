@@ -4,7 +4,7 @@
 -- 
 -- Create Date:  18:59:20 09/18/2010 
 -- Design Name: 
--- Module Name:  GPR - Behavioral 
+-- Module Name:  GPR - gpr_arch
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
@@ -19,20 +19,9 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
---use ieee.std_logic_unsigned.all;
-
 
 library work;
---use work.cpu.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
+use work.reg;
 
 entity gpr is
   Port (clk      : in   STD_LOGIC;
@@ -46,88 +35,95 @@ entity gpr is
 end gpr;
 
 
-architecture Behavioral of gpr is
-  signal  R0  : std_logic_vector(7 downto 0);
-  signal  R1  : std_logic_vector(7 downto 0);
-  signal  R2  : std_logic_vector(7 downto 0);
-  signal  R3  : std_logic_vector(7 downto 0);
-  signal  R4  : std_logic_vector(7 downto 0);
-  signal  R5  : std_logic_vector(7 downto 0);
-  signal  R6  : std_logic_vector(7 downto 0);
-  signal  R7  : std_logic_vector(7 downto 0);
+architecture gpr_arch of gpr is
+  component reg8 IS
+    port(I      : in  std_logic_vector(7 downto 0);
+         clock  : in  std_logic;
+         enable : in  std_logic;
+         Q      : out std_logic_vector(7 downto 0)
+        );
+  end component;
+
+  signal  R0E  : std_logic;  -- Enable signals
+  signal  R1E  : std_logic;
+  signal  R2E  : std_logic;
+  signal  R3E  : std_logic;
+  signal  R4E  : std_logic;
+  signal  R5E  : std_logic;
+  signal  R6E  : std_logic;
+  signal  R7E  : std_logic;
+  signal  Q0   : std_logic_VECTOR (7 downto 0);
+  signal  Q1   : std_logic_VECTOR (7 downto 0);
+  signal  Q2   : std_logic_VECTOR (7 downto 0);
+  signal  Q3   : std_logic_VECTOR (7 downto 0);
+  signal  Q4   : std_logic_VECTOR (7 downto 0);
+  signal  Q5   : std_logic_VECTOR (7 downto 0);
+  signal  Q6   : std_logic_VECTOR (7 downto 0);
+  signal  Q7   : std_logic_VECTOR (7 downto 0);
 BEGIN
-  process(clk, SelRx, SelRy)
+    reg_0 : reg8 port map(Ri, clk, R0E, Q0);
+    reg_1 : reg8 port map(Ri, clk, R1E, Q1);
+    reg_2 : reg8 port map(Ri, clk, R2E, Q2);
+    reg_3 : reg8 port map(Ri, clk, R3E, Q3);
+    reg_4 : reg8 port map(Ri, clk, R4E, Q4);
+    reg_5 : reg8 port map(Ri, clk, R5E, Q5);
+    reg_6 : reg8 port map(Ri, clk, R6E, Q6);
+    reg_7 : reg8 port map(Ri, clk, R7E, Q7);
+
+-- Set Ri the input
+  SetInput: process(clk, enable, SelRi)
   BEGIN
-    IF (rising_edge(clk)) THEN
-      CASE SelRx IS
-        when "000" =>
-          Rx <= R0;
-        when "001" =>
-          Rx <= R1;
-        when "010" =>
-          Rx <= R2;
-        when "011" =>
-          Rx <= R3;
-        when "100" =>
-          Rx <= R4;
-        when "101" =>
-          Rx <= R5;
-        when "110" =>
-          Rx <= R6;
-        when "111" =>
-          Rx <= R7;
-        when others =>
-          Rx <= (others => '0');
-      END CASE;
-      CASE SelRy IS
-        when "000" =>
-          Ry <= R0;
-        when "001" =>
-          Ry <= R1;
-        when "010" =>
-          Ry <= R2;
-        when "011" =>
-          Ry <= R3;
-        when "100" =>
-          Ry <= R4;
-        when "101" =>
-          Ry <= R5;
-        when "110" =>
-          Ry <= R6;
-        when "111" =>
-          Ry <= R7;
-        when others =>
-          Ry <= (others => '0');
-      END CASE;
-    END IF;
+    R0E <= '0';
+    R1E <= '0';
+    R2E <= '0';
+    R3E <= '0';
+    R4E <= '0';
+    R5E <= '0';
+    R6E <= '0';
+    R7E <= '0';
+    case SelRi IS
+      WHEN "000" =>
+        R0E <= '1';
+      WHEN "001" =>
+        R1E <= '1';
+      WHEN "010" =>
+        R2E <= '1';
+      WHEN "011" =>
+        R3E <= '1';
+      WHEN "100" =>
+        R4E <= '1';
+      WHEN "101" =>
+        R5E <= '1';
+      WHEN "110" =>
+        R6E <= '1';
+      WHEN "111" =>
+        R7E <= '1';
+      WHEN others =>
+        NULL; -- None of them are enabled
+    end case;
   end process;
 
-  process(clk, SelRi, enable)
-  BEGIN
-    IF (rising_edge(clk)) THEN
-      IF enable = '1' THEN
-        CASE SelRi IS
-          when "000" =>
-            R0 <= Ri;
-          when "001" =>
-            R1 <= Ri;
-          when "010" =>
-            R2 <= Ri;
-          when "011" =>
-            R3 <= Ri;
-          when "100" =>
-            R4 <= Ri;
-          when "101" =>
-            R5 <= Ri;
-          when "110" =>
-            R6 <= Ri;
-          when "111" =>
-            R7 <= Ri;
-          when others =>
-            NULL;
-        END CASE;
-      END IF;
-    END IF;
-  end process;
-end Behavioral;
+-- Set the Rx output
+  WITH SelRx SELECT
+  Rx <= Q0 WHEN "000",
+        Q1 WHEN "001",
+        Q2 WHEN "010",
+        Q3 WHEN "011",
+        Q4 WHEN "100",
+        Q5 WHEN "101",
+        Q6 WHEN "110",
+        Q7 WHEN others;
+
+-- Set the Ry output
+  WITH SelRy SELECT
+  Ry <= Q0 WHEN "000",
+        Q1 WHEN "001",
+        Q2 WHEN "010",
+        Q3 WHEN "011",
+        Q4 WHEN "100",
+        Q5 WHEN "101",
+        Q6 WHEN "110",
+        Q7 WHEN others;
+
+end gpr_arch;
 
