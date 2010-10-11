@@ -14,6 +14,7 @@ package mmu_control_types is
     inst_req     : std_logic; -- Low when the instruction address is valid and should be read.
     fr           : std_logic; -- High if latest input headers fetch request was set.
     inst_or_data : std_logic; -- High if latest input packet was an instruction packet.
+	 rw				: std_logic;
   end record;
 
   type control_out_type is record
@@ -78,6 +79,7 @@ use work.mmu_control_types.control_out_type;
           when idle =>
             if (input.data_req = '0' and input.data_add_0 = '1') then
               if input.data_read = '1' then
+				    output.data_ack <= '1';
                 data_state <= get_data;
               else
                 data_state <= put_data;

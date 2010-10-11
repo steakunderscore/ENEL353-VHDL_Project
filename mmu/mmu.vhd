@@ -10,6 +10,8 @@ use work.mmu_control_types.control_out_type;
 use work.header_builder;
 use work.header_decoder;
 
+use work.minimal_uart_core;
+
   entity mmu is
     port (
       -- instruction bus
@@ -26,8 +28,8 @@ use work.header_decoder;
       -- extras
       clk          : in  std_logic;
       recieve_pin  : in  std_logic;
-      transfer_pin : out std_logic;
-    )
+      transfer_pin : out std_logic
+    );
   end mmu;
   
   architecture mmu_arch of mmu is
@@ -37,43 +39,83 @@ use work.header_decoder;
     signal control_out : control_out_type;
     signal header_in   : std_logic_vector(7 downto 0);
     signal header_out  : std_logic_vector(7 downto 0);
+	 
+	 COMPONENT mmu_control_unit is
+    port (
+      input  : in  control_in_type;
+      output : out control_out_type;
+      clk    : in  std_logic
+    );
+  end COMPONENT;
+  
+  COMPONENT header_builder is
+  port (
+    read_write : in  std_logic; -- 1 = read, 0 = write
+    inst_data  : in  std_logic; -- 1 = inst, 0 = data
+    header     : out std_logic_vector(7 downto 0)
+  );
+  END COMPONENT;
+  
+  COMPONENT header_decoder is
+  port (
+    read_write    : out  std_logic; -- 1 = read, 0 = write
+    fetch_request : out std_logic;
+    inst_data     : out  std_logic; -- 1 = inst, 0 = data
+    header        : in std_logic_vector(7 downto 0)
+  );
+  END COMPONENT;
+  
+  COMPONENT minimal_uart_core is
+  port(
+    clock : in    std_logic;
+    eoc   : out   std_logic;
+    outp  : inout std_logic_vector(7 downto 0) := "ZZZZZZZZ";
+    rxd   : in    std_logic;
+    txd   : out   std_logic;
+    eot   : out   std_logic;
+    inp   : in    std_logic_vector(7 downto 0);
+    ready : out   std_logic;
+    wr    : in    std_logic
+  );
+  END COMPONENT;
 
+    begin
     control_in.data_add_0 <= data_add(0);
     control_in.data_read  <= data_read;
     control_in.data_req   <= data_req;
     control_in.inst_req   <= inst_req;
 
-    inst_ack <= control_in.inst_ack;
-    data_ack <= control_in.data_ack;
+    inst_ack <= control_out.inst_ack;
+    data_ack <= control_out.data_ack;
 
-    begin
       muart : minimal_uart_core port map (
-        clock <= clk,
-        eoc   <= control_in.eoc,
-        outp  <= muart_out,
-        rxd   <= recieve_pin,
-        txd   <= transfer_pin,
-        eot   <= control_in.eot,
-        inp   <= muart_in,
-        ready <= control_in.ready,
-        wr    <= control_out.write
+        clk,
+        control_in.eoc,
+        muart_out,
+        recieve_pin,
+        transfer_pin,
+        control_in.eot,
+        muart_in,
+        control_in.ready,
+        control_out.write
       );
 
       cu : mmu_control_unit port map (
-        input  <= control_in,
-        output <= control_out,
-        clk    <= clk
+        control_in,
+        control_out,
+        clk
       );
 
       hb : header_builder port map (
-        rw        <= data_red,
-        inst_data <= control_out.inst_or_data,
-        header    <= header_out
+        data_read,
+        control_out.inst_or_data,
+        header_out
       );
 
       hd : header_decoder port map (
-        fr        <= control_in.fr,
-        inst_data <= control_in.inst_or_data,
-        header    <= header_in
+			control_in.rw,
+        control_in.fr,
+        control_in.inst_or_data,
+        header_in
       );
   end mmu_arch;

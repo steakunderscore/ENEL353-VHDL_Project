@@ -61,6 +61,12 @@ COMPONENT switch_reg
           Q : OUT STD_LOGIC);
 END COMPONENT;
 
+COMPONENT tri_state
+    PORT ( a : in  STD_LOGIC;
+           b : in  STD_LOGIC;
+           c : out  STD_LOGIC);
+END COMPONENT;
+
 BEGIN
 sw1_status: switch_reg PORT MAP(switch1_connection,clk, clk, switch1_output); --!! reset --
 sw1_debouncer: debounce PORT MAP(clk, sw1,switch1_connection);
