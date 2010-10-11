@@ -4,11 +4,11 @@
 -- 
 -- Create Date:  18:59:20 09/18/2010 
 -- Design Name: 
--- Module Name:  cu - Behavioral 
+-- Module Name:  fulladder - Behavioral 
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 
--- Description: The control unit
+-- Description: 
 --
 -- Dependencies: 
 --
@@ -19,13 +19,6 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
-use ieee.std_logic_arith.all;
---use ieee.std_logic_unsigned.all;
-
-
-library work;
---use work.cpu.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -36,16 +29,24 @@ library work;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity cu is
-  Port (opcode : in  STD_LOGIC_VECTOR (15 downto 0); -- the instruction opcode
-        alu_f  : out STD_LOGIC_VECTOR (3 downto 0)
-  --TODO: complete the control unit
+entity fulladder is
+  Port (A    : in   STD_LOGIC;
+        B    : in   STD_LOGIC;
+        Cin  : in   STD_LOGIC;
+        Sum  : out  STD_LOGIC;
+        Cout : out  STD_LOGIC
         );
-end cu;
+end fulladder;
 
 
-architecture Behavioral of cu is
+architecture Behavioral of fulladder is
 BEGIN
-
+  process(A, B, Cin)
+    variable AxorB : std_logic; -- Make the code easier to read
+  BEGIN
+    AxorB := (A XOR B);
+    Sum <= AxorB XOR Cin;
+    Cout <= (AxorB XOR Cin) OR (A AND B);
+  end process;
 end Behavioral;
 
