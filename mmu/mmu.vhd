@@ -39,45 +39,45 @@ use work.minimal_uart_core;
     signal control_out : control_out_type;
     signal header_in   : std_logic_vector(7 downto 0);
     signal header_out  : std_logic_vector(7 downto 0);
-	 
-	 COMPONENT mmu_control_unit is
-    port (
-      input  : in  control_in_type;
-      output : out control_out_type;
-      clk    : in  std_logic
-    );
-  end COMPONENT;
+
+    component mmu_control_unit is
+      port (
+        input  : in  control_in_type;
+        output : out control_out_type;
+        clk    : in  std_logic
+      );
+    end component;
   
-  COMPONENT header_builder is
-  port (
-    read_write : in  std_logic; -- 1 = read, 0 = write
-    inst_data  : in  std_logic; -- 1 = inst, 0 = data
-    header     : out std_logic_vector(7 downto 0)
-  );
-  END COMPONENT;
+    component header_builder is
+      port (
+        read_write : in  std_logic; -- 1 = read, 0 = write
+        inst_data  : in  std_logic; -- 1 = inst, 0 = data
+        header     : out std_logic_vector(7 downto 0)
+      );
+    end component;
   
-  COMPONENT header_decoder is
-  port (
-    read_write    : out  std_logic; -- 1 = read, 0 = write
-    fetch_request : out std_logic;
-    inst_data     : out  std_logic; -- 1 = inst, 0 = data
-    header        : in std_logic_vector(7 downto 0)
-  );
-  END COMPONENT;
-  
-  COMPONENT minimal_uart_core is
-  port(
-    clock : in    std_logic;
-    eoc   : out   std_logic;
-    outp  : inout std_logic_vector(7 downto 0) := "ZZZZZZZZ";
-    rxd   : in    std_logic;
-    txd   : out   std_logic;
-    eot   : out   std_logic;
-    inp   : in    std_logic_vector(7 downto 0);
-    ready : out   std_logic;
-    wr    : in    std_logic
-  );
-  END COMPONENT;
+    component header_decoder is
+      port (
+        read_write    : out  std_logic; -- 1 = read, 0 = write
+        fetch_request : out std_logic;
+        inst_data     : out  std_logic; -- 1 = inst, 0 = data
+        header        : in std_logic_vector(7 downto 0)
+      );
+    end component;
+    
+    component minimal_uart_core is
+      port(
+        clock : in    std_logic;
+        eoc   : out   std_logic;
+        outp  : inout std_logic_vector(7 downto 0) := "ZZZZZZZZ";
+        rxd   : in    std_logic;
+        txd   : out   std_logic;
+        eot   : out   std_logic;
+        inp   : in    std_logic_vector(7 downto 0);
+        ready : out   std_logic;
+        wr    : in    std_logic
+      );
+    end component;
 
     begin
     control_in.data_add_0 <= data_add(0);
