@@ -19,65 +19,54 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
---use ieee.std_logic_unsigned.all;
-
 
 library work;
---use work.cpu.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
+use work.reg;
 
 entity ar is
   Port (clk      : in   STD_LOGIC;
         enable   : in   STD_LOGIC;
-        read     : in   STD_LOGIC;                       -- (not write)
-        SelR     : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
+        SelRi    : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
+        SelRo    : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
         Ri       : in   STD_LOGIC_VECTOR (15 downto 0);  -- The input
         Ro       : out  STD_LOGIC_VECTOR (15 downto 0)); -- The output
 end ar;
 
 
 architecture Behavioral of ar is
-  signal  A0     : std_logic_vector(15 downto 0);
-  signal  A1     : std_logic_vector(15 downto 0);
-  signal  A2     : std_logic_vector(15 downto 0);
+  component reg16 IS
+    port(I      : in  std_logic_vector(15 downto 0);
+         clock  : in  std_logic;
+         enable : in  std_logic;
+         Q      : out std_logic_vector(15 downto 0)
+        );
+  end component;
 BEGIN
-  process(clk, enable, SelR, Ri)
+    reg_0 : reg16 port map(Ri, clk, R0E, Q0);
+    reg_1 : reg16 port map(Ri, clk, R1E, Q1);
+    reg_2 : reg16 port map(Ri, clk, R2E, Q2);
+
+  SetInput: process(clk, enable, SelR, Ri)
   BEGIN
-    IF (rising_edge(clk)) THEN
-      IF (enable = '1') THEN
-        IF (read = '1') THEN
-          CASE SelR IS
-            when "00" =>
-              Ro <= A0;
-            when "01" =>
-              Ro <= A1;
-            when "10" =>
-              Ro <= A2;
-            when others =>
-              Ro <= (others => '0');
-          END CASE;
-        ELSE -- not read (write)
-          CASE SelR IS
-            when "00" =>
-              A0 <= Ri;
-            when "01" =>
-              A1 <= Ri;
-            when "10" =>
-              A2 <= Ri;
-            when others =>
-              NULL;
-          END CASE;
-        END IF;
-      END IF;
-    END IF;
+    R0E <= '0';
+    R1E <= '0';
+    R2E <= '0';
+    case SelRi IS
+      WHEN "00" =>
+        R0E <= '1';
+      WHEN "01" =>
+        R1E <= '1';
+      WHEN "10" =>
+        R2E <= '1';
+      WHEN others =>
+        NULL; -- None of them are enabled
+    end case;
   end process;
+
+  -- Set the Rx output
+  WITH SelRo SELECT
+  Rx <= Q0 WHEN "00",
+        Q1 WHEN "01",
+        Q2 WHEN others;
 end Behavioral;
 

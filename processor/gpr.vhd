@@ -70,7 +70,7 @@ BEGIN
     reg_6 : reg8 port map(Ri, clk, R6E, Q6);
     reg_7 : reg8 port map(Ri, clk, R7E, Q7);
 
--- Set Ri the input
+  -- Set Ri the input
   SetInput: process(clk, enable, SelRi)
   BEGIN
     R0E <= '0';
@@ -103,7 +103,7 @@ BEGIN
     end case;
   end process;
 
--- Set the Rx output
+  -- Set the Rx output
   WITH SelRx SELECT
   Rx <= Q0 WHEN "000",
         Q1 WHEN "001",

@@ -23,61 +23,45 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 
 library work;
---use work.cpu.ALL;
+use work.reg;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
-entity spr is
-  Port (clk      : in   STD_LOGIC;
-        enable   : in   STD_LOGIC;
-        read     : in   STD_LOGIC;                       -- Read/Write or Read-only
-        SelR     : in   STD_LOGIC_VECTOR (1 downto 0);   -- PC(0) SR(1) IR(2)
-        Ri       : in   STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SPR
-        Ro       : out  STD_LOGIC_VECTOR (15 downto 0)); -- The output from SPR
+entity sr is
+  Port (clk      : in  STD_LOGIC;
+        enable   : in  STD_LOGIC;
+        Ri       : in  STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SR
+        Ro       : out STD_LOGIC_VECTOR (15 downto 0)); -- The output from SR
 end spr;
 
 
-architecture Behavioral of spr is
-  signal  Rpc    : std_logic_vector(15 downto 0);
-  signal  Rsr    : std_logic_vector(15 downto 0);
-  signal  Rir    : std_logic_vector(15 downto 0);
+architecture sr_arch of sr is
+  component reg16 IS
+    port(I       : in  std_logic_vector(15 downto 0);
+         clock   : in  std_logic;
+         enable  : in  std_logic;
+         Q       : out std_logic_vector(15 downto 0)
+        );
+  end component;
 BEGIN
-  process(clk, enable, SelR, Ri)
-  BEGIN
-    IF (rising_edge(clk)) THEN
-      IF (enable = '1') THEN
-        IF (read = '0') THEN  --Only write when Read/Write mode
-          CASE SelR IS
-            when "00" =>
-              Rpc <= Ri;
-            when "01" =>
-              Rsr <= Ri;
-            when "10" =>
-              Rir <= Ri;
-            when others =>
-              NULL;
-          END CASE;
-        END IF;
+  reg_sr : reg16 port map(Ri, clk, enable, Ro);
+end sr_arch;
 
-        CASE SelR IS  --Read in both Read/Write and Read-only modes
-          when "00" =>
-            Ro <= Rpc;
-          when "01" =>
-            Ro <= Rsr;
-          when "10" =>
-            Ro <= Rir;
-          when others =>
-            Ro <= (others => '0');
-        END CASE;
-      END IF;
-    END IF;
-  end process;
-end Behavioral;
+entity pc is
+  Port (clk      : in  STD_LOGIC;
+        enable   : in  STD_LOGIC;
+        Ri       : in  STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SR
+        Ro       : out STD_LOGIC_VECTOR (15 downto 0)); -- The output from SR
+end spr;
+
+
+architecture pc_arch of pc is
+  component reg16 IS
+    port(I       : in  std_logic_vector(15 downto 0);
+         clock   : in  std_logic;
+         enable  : in  std_logic;
+         Q       : out std_logic_vector(15 downto 0)
+        );
+  end component;
+BEGIN
+  reg_pc : reg16 port map(Ri, clk, enable, Ro);
+end pc_arch;
 
