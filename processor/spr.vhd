@@ -4,7 +4,7 @@
 -- 
 -- Create Date:  18:59:20 09/18/2010
 -- Design Name: 
--- Module Name:  spr - Behavioral
+-- Module Name:  sr - sr_arch
 -- Project Name: 
 -- Target Devices: 
 -- Tool versions: 

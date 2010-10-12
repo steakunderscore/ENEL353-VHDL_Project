@@ -81,26 +81,28 @@ BEGIN
     R5E <= '0';
     R6E <= '0';
     R7E <= '0';
-    case SelRi IS
-      WHEN "000" =>
-        R0E <= '1';
-      WHEN "001" =>
-        R1E <= '1';
-      WHEN "010" =>
-        R2E <= '1';
-      WHEN "011" =>
-        R3E <= '1';
-      WHEN "100" =>
-        R4E <= '1';
-      WHEN "101" =>
-        R5E <= '1';
-      WHEN "110" =>
-        R6E <= '1';
-      WHEN "111" =>
-        R7E <= '1';
-      WHEN others =>
-        NULL; -- None of them are enabled
-    end case;
+	 IF enable = '1' THEN
+      case SelRi IS
+        WHEN "000" =>
+          R0E <= '1';
+        WHEN "001" =>
+          R1E <= '1';
+        WHEN "010" =>
+          R2E <= '1';
+        WHEN "011" =>
+          R3E <= '1';
+        WHEN "100" =>
+          R4E <= '1';
+        WHEN "101" =>
+          R5E <= '1';
+        WHEN "110" =>
+          R6E <= '1';
+        WHEN "111" =>
+          R7E <= '1';
+        WHEN others =>
+          NULL; -- None of them are enabled
+      end case;
+	 END IF;
   end process;
 
   -- Set the Rx output
