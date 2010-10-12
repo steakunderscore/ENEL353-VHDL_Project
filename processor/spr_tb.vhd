@@ -14,8 +14,7 @@ architecture TB of spr_TB is
 
   component spr
   Port (clk      : in   STD_LOGIC;
-        enable   : in   STD_LOGIC;
-        read     : in   STD_LOGIC;                       -- read-only
+        enable   : in   STD_LOGIC;                       -- Enable write
         SelR     : in   STD_LOGIC_VECTOR (1 downto 0);   -- PC(0) SR(1) IR(2)
         Ri       : in   STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SPR
         Ro       : out  STD_LOGIC_VECTOR (15 downto 0)); -- The output from SPR
@@ -30,7 +29,7 @@ architecture TB of spr_TB is
 
 begin
 
-  U_spr: spr port map (clk => T_clk, enable => T_enable, read => T_read, SelR => T_SelR, Ri => T_Ri, Ro => T_Ro);
+  U_spr: sr port map (clk => T_clk, enable => T_enable, SelR => T_SelR, Ri => T_Ri, Ro => T_Ro);
 
     -- concurrent process to offer the clk signal
   process

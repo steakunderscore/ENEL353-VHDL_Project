@@ -33,7 +33,7 @@ cpu: cpu.o
 gpr_tb: gpr.o gpr_tb.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
-gpr: gpr.o
+gpr: gpr.o reg.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 IO: IO.o
@@ -48,7 +48,10 @@ mmu: mmu.o
 spr_tb: spr.o spr_tb.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
-spr: spr.o
+spr: spr.o reg.o
+	$(GHDL) -e $(GHDLFLAGS) $@
+
+reg: reg.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 # Targets to analyze files
@@ -67,7 +70,7 @@ cpu.o: processor/cpu.vhd
 gpr_tb.o: processor/gpr_tb.vhd gpr.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-gpr.o: processor/gpr.vhd
+gpr.o: processor/gpr.vhd reg.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 IO.o: IO.vhd
@@ -85,6 +88,8 @@ mmu.o: mmu.vhd
 spr_tb.o: processor/spr_tb.vhd spr.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-spr.o: processor/spr.vhd
+spr.o: processor/spr.vhd reg.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
+reg.o: processor/reg.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<

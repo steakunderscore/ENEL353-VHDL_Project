@@ -21,7 +21,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 library work;
-use work.reg;
+use work.reg8;
 
 entity gpr is
   Port (clk      : in   STD_LOGIC;

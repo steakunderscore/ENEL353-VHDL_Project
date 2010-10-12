@@ -17,7 +17,7 @@
 -- Additional Comments: 
 --
 --------------------------------------------------------------------------------
-library ieee ;
+library ieee;
 use ieee.std_logic_1164.all;
 
 entity reg8 is
@@ -27,7 +27,7 @@ port(I      : in  std_logic_vector(7 downto 0);
      enable : in  std_logic;
      Q      : out std_logic_vector(7 downto 0)
     );
-end reg;
+end reg8;
 
 architecture behv of reg8 is
 begin
@@ -46,6 +46,8 @@ begin
 end behv;
 
 --------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
 
 entity reg16 is
 
@@ -54,7 +56,7 @@ port(I      : in  std_logic_vector(15 downto 0);
      enable : in  std_logic;
      Q      : out std_logic_vector(15 downto 0)
     );
-end reg;
+end reg16;
 
 architecture behv of reg16 is
 begin
