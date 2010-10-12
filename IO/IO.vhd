@@ -26,6 +26,7 @@ library work;
 use work.buses.ALL;
 use work.debounce;
 use work.switch_reg;
+use work.led_io;
 
 
 
@@ -36,59 +37,58 @@ use work.switch_reg;
 
 entity IO is
        PORT(
-            data_bus    : INOUT buses.data_bus;
-            clk         : IN std_logic;
-            sw1         : IN std_logic;
-            sw2         : IN std_logic);
+				-- data bus --
+				data_add		: IN 			std_logic_vector(15 DOWNTO 0);  	-- address lines --
+				data_data	: INOUT 		std_logic_vector(7 DOWNTO 0);  	-- data lines --
+				data_read	: INOUT 		std_logic;								-- pulled high for read, low for write --
+				data_req		: INOUT		std_logic;								-- pulled low to request bus usage --
+				data_ack		: INOUT		std_logic;								-- pulled high to inform request completion --
+				-- io --
+            clk         : IN 			std_logic;
+            sw1         : IN 			std_logic;
+            sw2         : IN 			std_logic);
             --leds      : OUT std_logic_vector(7 DOWNTO 0);
 end IO;
 
 architecture Behavioral of IO is
 
-signal led_state    : std_logic_vector(7 DOWNTO 0);
-signal enable       : std_logic;
-signal switch1_connection : std_logic;
-signal switch1_output : std_logic;
+	signal led_state    				: std_logic_vector(7 DOWNTO 0);
+	signal enable       				: std_logic;
+	signal switch1_connection 		: std_logic;
+	signal switch1_output 			: std_logic;
+	signal switch1_state 			: std_logic;
 
-COMPONENT debounce
+	COMPONENT debounce
           PORT(clk, switch : IN STD_LOGIC;
           switch_state: OUT STD_LOGIC);
-END COMPONENT;
+	END COMPONENT;
 
-COMPONENT switch_reg
+	COMPONENT switch_reg
           PORT( D : IN STD_LOGIC;
           reset, clk : IN STD_LOGIC;
           Q : OUT STD_LOGIC);
-END COMPONENT;
+	END COMPONENT;
+	
+	COMPONENT led_io
+		PORT(
+				data_add		: IN 			std_logic_vector(15 DOWNTO 0);  	-- address lines --
+				data_data	: INOUT 		std_logic_vector(7 DOWNTO 0);  	-- data lines --
+				data_read	: INOUT 		std_logic;								-- pulled high for read, low for write --
+				data_req		: INOUT		std_logic;								-- pulled low to request bus usage --
+				data_ack		: INOUT		std_logic;								-- pulled high to inform request completion --
+				--
+				clock 		: IN			std_logic
+				);
+	END COMPONENT;
 
-COMPONENT tri_state
-    PORT ( a : in  STD_LOGIC;
-           b : in  STD_LOGIC;
-           c : out  STD_LOGIC);
-END COMPONENT;
 
 BEGIN
-sw1_status: switch_reg PORT MAP(switch1_connection,clk, clk, switch1_output); --!! reset --
+sw1_status: switch_reg PORT MAP(switch1_state,clk, clk, switch1_output); --!! reset --
 sw1_debouncer: debounce PORT MAP(clk, sw1,switch1_connection);
-     PROCESS(clk, data_bus)
-     BEGIN
-     IF data_bus.req = '0' AND data_bus.add = '0000000000001110' AND data_bus.red = '0' THEN
-        enable <= '1';
-     ELSE
-         enable <= '0';
-     END IF
-     END PROCESS;
 
-    PROCESS(clk, data_bus, leds) -- process of read data from the CPU and display LEDS
-    BEGIN
-    IF rising_edge(clk) THEN
-       IF enable = '1' THEN
-            led_state <= data_bus.data;
-            data_bus.ack <= '0';
-        END IF; -- do I need an ELSE clause to tell it to wait a cycle and detect again ???
-            -- have to have a flip-flop per led ? how are they represented ???
-    END IF;
-    END PROCESS;
+led: led_io PORT MAP(data_add, data_data, data_read, data_req, data_ack, clk);
+
+ 
 -----------------------------------------------------------------------------------------------
 --Check the buttons status
 -- PROCESS(clk,data_bus, sw1, sw2)
@@ -104,13 +104,13 @@ sw1_debouncer: debounce PORT MAP(clk, sw1,switch1_connection);
  --   END PROCESS;
 
  -- Checks for cpu request on button
- PROCESS(clk, data_bus)
+ PROCESS(clk, data_read)
  BEGIN
       IF rising_edge(clk) THEN
-         IF data_bus.red = '1' THEN
-            IF data_bus.add = '0000000000000010' THEN
-               data_bus.data <= switch1_output;
-            ELSIF data_bus.add = '0000000000000100' THEN
+         IF data_read = '1' THEN
+            IF data_add = "0000000000000010" THEN
+               data_data <= "11111111";
+            ELSIF data_add = "0000000000000100" THEN
                -- send button 2 status
 
             END IF;

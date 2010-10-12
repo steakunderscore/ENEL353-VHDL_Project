@@ -33,7 +33,7 @@ END debounce;
 ARCHITECTURE debounced_switch OF debounce IS
              SIGNAL count : STD_LOGIC_VECTOR(2 DOWNTO 0);  --variable or signal???
 BEGIN
-     PROCESS(clk)
+     PROCESS(clk, switch)
      BEGIN
           IF switch = '0' THEN
              count <= "000";
