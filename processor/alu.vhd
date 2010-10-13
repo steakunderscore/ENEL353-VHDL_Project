@@ -101,46 +101,46 @@ BEGIN
             C := '0'; -- Carry is always 0
             N := output(7); -- This might need to be changed to '0'
 
-          when '1' => -- It is a arithmetic function
-            case f(2 downto 1) is
-              when "00" => -- Do ADD operation
-                AdderCin <= '0';
-                A <= ry;
-                B <= rx;
-                output := Sum;
-                C := AdderCout;
-                N := output(7);
-              when "01" => -- Do ADC operation
-                AdderCin <= Cin;
-                A <= ry;
-                B <= rx;
-                output := Sum;
-                C := AdderCout;
-                N := output(7);
-              when "10" => -- Do SUB operation
-                AdderCin <= '1';
-                A <= ry;
-                B <= (not rx);
-                output := Sum;
-                C := AdderCout;
-                N := output(7);
-              when "11" => -- Do SBB operation
-                AdderCin <= (not Cin);
-                A <= ry;
-                B <= (not rx);
-                output := Sum;
-                C := AdderCout;
-                N := output(7);
-              when others =>
-                output := (others => '0');
-                C := AdderCout;
-                N := output(7);
-            end case;
-            if (output = "00000000") then -- Set the Zero in status register
-              Z := '1';
-            ELSE
-              Z := '0';
-            end if;
+--          when '1' => -- It is a arithmetic function
+--            case f(2 downto 1) is
+--              when "00" => -- Do ADD operation
+--                AdderCin <= '0';
+--                A <= ry;
+--                B <= rx;
+--                output := Sum;
+--                C := AdderCout;
+--                N := output(7);
+--              when "01" => -- Do ADC operation
+--                AdderCin <= Cin;
+--                A <= ry;
+--                B <= rx;
+--                output := Sum;
+--                C := AdderCout;
+--                N := output(7);
+--              when "10" => -- Do SUB operation
+--                AdderCin <= '1';
+--                A <= ry;
+--                B <= (not rx);
+--                output := Sum;
+--                C := AdderCout;
+--                N := output(7);
+--              when "11" => -- Do SBB operation
+--                AdderCin <= (not Cin);
+--                A <= ry;
+--                B <= (not rx);
+--                output := Sum;
+--                C := AdderCout;
+--                N := output(7);
+--              when others =>
+--                output := (others => '0');
+--                C := AdderCout;
+--                N := output(7);
+--            end case;
+--            if (output = "00000000") then -- Set the Zero in status register
+--              Z := '1';
+--            ELSE
+--              Z := '0';
+--            end if;
           when others =>
             output := (others => '0');
         end case;
@@ -148,17 +148,17 @@ BEGIN
         case f(3 downto 1) is
           when "010" => -- Do NEG operation ( two's complement )
             AdderCin <= '1';
-            A <= (others => '0');
+--            A <= (others => '0');
             B <= (not rx);
             output := Sum;
             C := AdderCout;
             N := output(7);
           when "011" => -- Do CMP operation
-            AdderCin <= '1';
+--            AdderCin <= '1';
             A <= rx;
-            B <= (not ry);
-            C := AdderCout;
-            N := output(7);
+--            B <= (not ry);
+--            C := AdderCout;
+--            N := output(7);
           when others =>
             output := (others => '0');
         end case;
