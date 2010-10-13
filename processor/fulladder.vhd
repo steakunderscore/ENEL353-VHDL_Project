@@ -79,5 +79,5 @@ BEGIN
     --FAx: fulladder PORT MAP(Ax => A(i), Bx => B(i), Cin => Carry(i), Sx => Sum(i), Cout => Carry(i+1));
   --END GENERATE;
   
-  Cout <= Carry(0);
+  Cout <= Carry(8);
 end arch_fulladder8;
