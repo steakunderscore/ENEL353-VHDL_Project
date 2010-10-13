@@ -1,13 +1,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
-use work.mmu_control_types.data_in_type;
-use work.mmu_control_types.data_out_type;
-use work.mmu_control_types.muart_input_state;
-use work.mmu_control_types.muart_output_state;
+use work.mmu_types.all;
 
 entity data_control_unit is
   port (

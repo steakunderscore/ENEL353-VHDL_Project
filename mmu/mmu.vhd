@@ -4,9 +4,8 @@ use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
+use work.mmu_types.all;
 use work.mmu_control_unit;
-use work.mmu_control_types.control_in_type;
-use work.mmu_control_types.control_out_type;
 use work.header_builder;
 use work.header_decoder;
 
