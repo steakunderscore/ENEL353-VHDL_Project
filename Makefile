@@ -28,6 +28,9 @@ buses: buses.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 cpu: cpu.o
+	$(GHDL) -e $(GHDLFLAGS) $@processor/cpu.vhd
+
+cu: cu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 gpr_tb: gpr.o gpr_tb.o
@@ -65,6 +68,9 @@ buses.o: buses.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 cpu.o: processor/cpu.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+cu.o: processor/cu.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 gpr_tb.o: processor/gpr_tb.vhd gpr.o
