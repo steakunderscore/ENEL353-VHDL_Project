@@ -67,7 +67,7 @@ begin
   muart : minimal_uart_core port map (clk, eoc, outp, rxd, txd, eot, inp, ready, wr);
   
   rxd <= transfer_pin;
-  txd <= receive_pin;
+  receive_pin <= txd;
   
   clk_gen : process begin
     clk <= '0';
@@ -86,10 +86,14 @@ begin
     type pattern_array is array (natural range <>) of pattern_type;
     constant patterns : pattern_array :=
 --     inst_add       recv_head   send_head   inst_data
-    (("000000000000", "10000001", "00000000", "0000000000000000"),
-     ("000000000000", "10000001", "10000001", "0000000000000000"));
+    ((x"000", x"81", x"00", x"83A7"),
+     (x"001", x"81", x"00", x"4F5E"),
+     (x"101", x"81", x"00", x"5937"),
+     (x"051", x"81", x"00", x"A8F2"));
   begin
+    wr <= '0';
     for i in patterns'range loop
+      wait for 10000 ns;
       inst_add <= patterns(i).inst_add;
       wait for 20 ns;
       inst_req <= '0';
@@ -100,19 +104,86 @@ begin
         severity error;
       wait until eoc'event;
       
-      assert false report "passed header" severity error;
+      assert false report "passed header" severity note;
       
       wait until eoc'event;
       assert outp = patterns(i).inst_add(7 downto 0)
-        report "Bad address low"
+        report "Bad address low expected '" & str(patterns(i).inst_add(7 downto 0)) & "' recieved '" & str(outp) & "'"
         severity error;
       wait until eoc'event;
       
+      assert false report "passed address low" severity note;
+      
       wait until eoc'event;
       assert outp = "0000" & patterns(i).inst_add(11 downto 8)
-        report "Bad address high"
+        report "Bad address high expected '" & str(patterns(i).inst_add(11 downto 8)) & "' recieved '" & str(outp) & "'"
         severity error;
       wait until eoc'event;
+      
+      assert false report "passed address high" severity note;
+      
+      wait for 100 ns;
+      inp <= patterns(i).send_head;
+      wait for 20 ns;
+      wr <= '1';
+      wait for 20 ns;
+      wr <= '0';
+      wait until eot'event;
+      wait until eot'event;
+      
+      
+      wait for 100 ns;
+      inp <= "0000" & patterns(i).inst_add(11 downto 8);
+      wait for 20 ns;
+      wr <= '1';
+      wait for 20 ns;
+      wr <= '0';
+      wait until eot'event;
+      wait until eot'event;
+
+
+      wait for 100 ns;
+      inp <= patterns(i).inst_add(7 downto 0);
+      wait for 20 ns;
+      wr <= '1';
+      wait for 20 ns;
+      wr <= '0';
+      wait until eot'event;
+      wait until eot'event;
+
+
+      wait for 100 ns;
+      inp <= patterns(i).inst_data(7 downto 0);
+      wait for 20 ns;
+      wr <= '1';
+      wait for 20 ns;
+      wr <= '0';
+      wait until eot'event;
+      wait until eot'event;
+
+
+      wait for 100 ns;
+      inp <= patterns(i).inst_data(15 downto 8);
+      wait for 20 ns;
+      wr <= '1';
+      wait for 20 ns;
+      wr <= '0';
+      wait until eot'event;
+      wait until eot'event;
+      
+      assert inst_ack = '1'
+        report "receipt not acknowledged"
+        severity error;
+      
+      assert inst_data = patterns(i).inst_data
+        report "Wrong data recieve expected '" & str(patterns(i).inst_data) & "' recieved '" & str(inst_data) & "'"
+        severity error;
+      
+      assert false report "finished transmission" severity note;
+      
+      wait for 20 ns;
+
+      inst_req <= '1';
     end loop;
     wait;
   end process;

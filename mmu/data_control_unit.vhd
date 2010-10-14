@@ -6,8 +6,16 @@ use work.mmu_types.all;
 
 entity data_control_unit is
   port (
-    input  : in  data_in_type;
-    output : out data_out_type;
+     eoc          : in std_logic; -- High on muart has finished collecting data ??
+     eot          : in std_logic; -- High on muart has finished transmitting data.
+     ready        : in std_logic; -- ??
+     data_read    : in std_logic; -- High if the data line is requesting a read, low for write.
+     data_req     : in std_logic; -- Low when the data address is valid and should be read.
+     data_add_0   : in std_logic; -- High for memory address, not IO.
+     write        : out std_logic; -- High to start muart writing data.
+     data_ack     : out std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
+     muart_input  : out muart_input_state; -- State to multiplex the muart's input
+     muart_output : out muart_output_state; -- State to multiplex the muart's output.
     clk    : in  std_logic
   );
 end data_control_unit;
@@ -25,11 +33,11 @@ architecture data_control_unit_arch of data_control_unit is
   signal reader_state : read_state_type := idle;
   signal transmitter_state : transmit_state_type := idle;
 begin
-  data_fsm : process(state, input.data_req, clk) begin
+  data_fsm : process(state, data_req, clk) begin
     if (rising_edge(clk)) then
       case state is
         when idle =>
-          if (input.data_req = '0' and input.data_add_0 = '1') then
+          if (data_req = '0' and data_add_0 = '1') then
             state <= get_data;
           end if;
         
@@ -39,7 +47,7 @@ begin
           end if;
         
         when wait_clear =>
-          if (input.data_req = '1') then
+          if (data_req = '1') then
             state <= idle;
           end if;
         
@@ -68,7 +76,7 @@ begin
           
           when send_add_high =>
             if transmitter_state = finished then
-              if input.data_read = '1' then
+              if data_read = '1' then
                 get_state <= get_header;
               else
                 get_state <= send_data;
@@ -110,14 +118,14 @@ begin
     end if;
   end process get_data_fsm;
   
-  transmit_fsm : process(clk, get_state, transmitter_state, input.eot) begin
+  transmit_fsm : process(clk, get_state, transmitter_state, eot) begin
     if rising_edge(clk) then
       if ((get_state = send_header) or
           (get_state = send_add_low) or
           (get_state = send_add_high)) then
         case transmitter_state is
           when idle =>
-            if input.ready = '1' then
+            if ready = '1' then
               transmitter_state <= set_data;
             end if;
           
@@ -128,7 +136,7 @@ begin
             transmitter_state <= pause;
           
           when pause =>
-            if input.eot = '1' then
+            if eot = '1' then
               transmitter_state <= finished;
             end if;
           
@@ -142,7 +150,7 @@ begin
     end if;
   end process transmit_fsm;
   
-  read_fsm : process(clk, get_state, reader_state, input.eoc) begin
+  read_fsm : process(clk, get_state, reader_state, eoc) begin
     if rising_edge(clk) then
       if ((get_state = get_header) or
           (get_state = get_add_low) or
@@ -153,7 +161,7 @@ begin
             reader_state <= wait_data;
           
           when wait_data =>
-            if input.eoc = '1' then
+            if eoc = '1' then
               reader_state <= read_data;
             end if;
           
@@ -161,7 +169,7 @@ begin
             reader_state <= pause;
           
           when pause =>
-            if input.eoc = '0' then
+            if eoc = '0' then
               reader_state <= finished;
             end if;
           
@@ -177,22 +185,22 @@ begin
   
   -- Outputs
   with state select
-    output.data_ack <= '1' when wait_clear,
+    data_ack <= '1' when wait_clear,
                        'Z' when idle,
                        '0' when others;
   
   with transmitter_state select
-    output.write <= '1' when trans_data,
+    write <= '1' when trans_data,
                     '0' when others;
   
-  output.muart_input <= idle          when transmitter_state /= set_data and transmitter_state /= trans_data else
+  muart_input <= idle          when transmitter_state /= set_data and transmitter_state /= trans_data else
                         header        when get_state = send_header   else
                         data_add_high when get_state = send_add_high else
                         data_add_low  when get_state = send_add_low  else
                         data_data     when get_state = send_data     else
                         idle;
   
- output.muart_output <= clear_data when state = idle              else
+ muart_output <= clear_data when state = idle              else
                         idle       when reader_state /= read_data else
                         header     when get_state = get_header    else
                          data_data  when get_state = get_data      else
