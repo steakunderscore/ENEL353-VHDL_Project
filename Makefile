@@ -12,7 +12,7 @@ all: alu_tb alu cpu IO microprocessor mmu
 
 .PHONY: cleanall
 cleanall: clean
-	rm -f alu_tb alu gpr_tb gpr pc spr_tb sr fulladder fulladder8_tb
+	rm -f alu_tb alu gpr_tb gpr pc spr_tb sr fulladder dulladder8_tb mmu_main mmu_tb *.cf *.lst
 
 .PHONY: clean
 clean:
@@ -49,7 +49,10 @@ IO: IO.o
 microprocessor: microprocessor.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
-mmu: mmu.o
+mmu_main: mmu_main.o mmu_types.o control_unit.o minimal_uart_core.o header_builder.o header_decoder.o reg.o
+	$(GHDL) -e $(GHDLFLAGS) $@
+
+mmu_tb: mmu_tb.o mmu_main.o txt_util.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 pc: spr.o reg.o
@@ -71,10 +74,19 @@ alu_tb.o: processor/alu_tb.vhd alu.o
 alu.o: processor/alu.vhd fulladder.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
+br_generator.o: mmu/muart/BRG.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+control_unit.o: mmu/control_unit.vhd mmu_types.o data_control_unit.o inst_control_unit.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
 cpu.o: processor/cpu.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 cu.o: processor/cu.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+data_control_unit.o: mmu/data_control_unit.vhd mmu_types.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 fulladder_tb.o: processor/fulladder_tb.vhd fulladder.o
@@ -89,19 +101,40 @@ gpr_tb.o: processor/gpr_tb.vhd gpr.o
 gpr.o: processor/gpr.vhd reg.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
+header_builder.o: mmu/header_builder.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+header_decoder.o: mmu/header_decoder.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+inst_control_unit.o: mmu/inst_control_unit.vhd mmu_types.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
 IO.o: IO.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 microprocessor.o: microprocessor.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-mmu.o: mmu.vhd
+minimal_uart_core.o: mmu/muart/serial.vhd br_generator.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+mmu_main.o: mmu/mmu.vhd mmu_types.o control_unit.o minimal_uart_core.o header_builder.o header_decoder.o reg.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+mmu_tb.o: mmu/mmu_tb.vhd mmu_main.o txt_util.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+mmu_types.o: mmu/mmu_types.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 spr_tb.o: processor/spr_tb.vhd spr.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 spr.o: processor/spr.vhd reg.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+txt_util.o: txt_util.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 reg.o: processor/reg.vhd

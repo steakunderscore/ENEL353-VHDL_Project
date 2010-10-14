@@ -113,7 +113,9 @@ begin
           (get_state = send_add_high)) then
         case transmitter_state is
           when idle =>
-            transmitter_state <= set_data;
+            if input.ready = '1' then
+              transmitter_state <= set_data;
+            end if;
           
           when set_data =>
             transmitter_state <= trans_data;

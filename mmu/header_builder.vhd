@@ -2,8 +2,6 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
 
@@ -17,7 +15,7 @@ end header_builder;
 
 architecture header_builder_arch of header_builder is
 begin
-  header(7) <= read_write and not(inst_data); -- reading from or writing to
+  header(7) <= read_write or inst_data; -- reading from or writing to
                                              -- memory? (can't write
                                              -- instructions)
   header(6) <= '0'; -- reserved

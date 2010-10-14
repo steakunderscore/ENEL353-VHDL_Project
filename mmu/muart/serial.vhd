@@ -31,7 +31,6 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity minimal_uart_core is
   port(

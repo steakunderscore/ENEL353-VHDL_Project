@@ -41,19 +41,13 @@ begin
   inst_in.eot          <= input.eot;
   inst_in.ready        <= input.ready;
   inst_in.inst_req     <= input.inst_req;
-  inst_in.fr           <= input.fr;
-  inst_in.inst_or_data <= input.inst_or_data;
-  inst_in.rw           <= input.rw;
   
   data_in.eoc          <= input.eoc;
   data_in.eot          <= input.eot;
   data_in.ready        <= input.ready;
   data_in.data_read    <= input.data_read;
-  data_in.data_req     <= input.inst_req;
+  data_in.data_req     <= input.data_req;
   data_in.data_add_0   <= input.data_add_0;
-  data_in.fr           <= input.fr;
-  data_in.inst_or_data <= input.inst_or_data;
-  data_in.rw           <= input.rw;
   
   output.write <= inst_out.write or data_out.write;
   output.inst_or_data <= inst_out.inst_or_data;

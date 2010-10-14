@@ -1,17 +1,16 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
 use work.mmu_types.all;
 use work.mmu_control_unit;
 use work.header_builder;
 use work.header_decoder;
+use work.reg8;
 
 use work.minimal_uart_core;
 
-  entity mmu is
+  entity mmu_main is
     port (
       -- instruction bus
       inst_add  : in  std_logic_vector(11 downto 0); -- Address lines.
@@ -20,7 +19,7 @@ use work.minimal_uart_core;
       inst_ack  : out std_logic;                     -- Pulled high to inform of request completion.
       -- data bus
       data_add  : in    std_logic_vector(15 downto 0); -- Address lines.
-      data_data : inout std_logic_vector(7 downto 0);  -- Data lines.
+      data_line : inout std_logic_vector(7 downto 0);  -- Data lines.
       data_read : in    std_logic;                     -- High for a read request, low for a write request.
       data_req  : in    std_logic;                     -- Pulled low to request bus usage.
       data_ack  : inout std_logic;                     -- Pulled high to inform of request completion.
@@ -29,16 +28,9 @@ use work.minimal_uart_core;
       receive_pin  : in  std_logic;
       transfer_pin : out std_logic
     );
-  end mmu;
+  end mmu_main;
   
-  architecture mmu_arch of mmu is
-    signal muart_out : std_logic_vector(7 downto 0);
-    signal muart_in  : std_logic_vector(7 downto 0);
-    signal control_in  : control_in_type;
-    signal control_out : control_out_type;
-    signal header_in   : std_logic_vector(7 downto 0);
-    signal header_out  : std_logic_vector(7 downto 0);
-
+  architecture mmu_arch of mmu_main is
     component mmu_control_unit is
       port (
         input  : in  control_in_type;
@@ -77,12 +69,36 @@ use work.minimal_uart_core;
         wr    : in    std_logic
       );
     end component;
+    
+    component reg8 IS
+      port(
+        I      : in  std_logic_vector(7 downto 0);
+        clock  : in  std_logic;
+        enable : in  std_logic;
+        Q      : out std_logic_vector(7 downto 0)
+      );
+    end component;
+    
+    
+    signal muart_out : std_logic_vector(7 downto 0);
+    signal muart_in  : std_logic_vector(7 downto 0);
+    signal control_in  : control_in_type;
+    signal control_out : control_out_type;
+    signal header_in   : std_logic_vector(7 downto 0);
+    signal header_out  : std_logic_vector(7 downto 0);
+    signal inst_data_high_enable : std_logic;
+    signal inst_data_low_enable : std_logic;
+    signal data_data_enable : std_logic;
+    signal data_line_tri : std_logic_vector(7 downto 0);
 
     begin
     muart : minimal_uart_core port map (clk, control_in.eoc, muart_out, receive_pin, transfer_pin, control_in.eot, muart_in, control_in.ready, control_out.write);
-    cu : mmu_control_unit port map (control_in, control_out, clk);
-    hb : header_builder port map (data_read, control_out.inst_or_data, header_out);
-    hd : header_decoder port map (control_in.rw, control_in.fr, control_in.inst_or_data, header_in);
+    cu  : mmu_control_unit port map (control_in, control_out, clk);
+    hb  : header_builder port map (data_read, control_out.inst_or_data, header_out);
+    hd  : header_decoder port map (control_in.rw, control_in.fr, control_in.inst_or_data, header_in);
+    idh : reg8 port map (muart_out, clk, inst_data_high_enable, inst_data(15 downto 8));
+    idl : reg8 port map (muart_out, clk, inst_data_low_enable,  inst_data(7  downto 0));
+    dd  : reg8 port map (muart_out, clk, data_data_enable,      data_line_tri);
     
     control_in.data_add_0 <= data_add(0);
     control_in.data_read  <= data_read;
@@ -93,32 +109,37 @@ use work.minimal_uart_core;
     data_ack <= control_out.data_ack;
     
     with control_out.muart_input select
-      muart_input <= header_out             when header,
-                     inst_add(15 downto 8)  when inst_add_high,
-                     inst_add(7  downto 0)  when inst_add_low,
-                     data_add(15 downto 8)  when data_add_high,
-                     data_add(7  downto 0)  when data_add_low,
-                     data_data              when data_data,
-                     (others <= '0')          when others;
-    route_output : process(control_out.muart_output) begin
-      header_in               <= (others <= '0');
-      inst_data(15 downto 8)  <= inst_data(15 downto 8);
-      inst_data(7  downto 0)  <= inst_data(7  downto 0);
-      data_data               <= data_data;
+      muart_in <=  header_out                               when header,
+                   "0000" & inst_add(11 downto 8)  when inst_add_high,
+                   inst_add(7  downto 0)                    when inst_add_low,
+                   data_add(15 downto 8)                    when data_add_high,
+                   data_add(7  downto 0)                    when data_add_low,
+                   data_line                                when data_data,
+                   (others => '0')                          when others;
+    
+    route_output : process(control_out.muart_output, muart_out) begin
+      header_in <= (others => '0');
+      inst_data_high_enable <= '0';
+      inst_data_low_enable <= '0';
+      data_data_enable <= '0';
       case control_out.muart_output is
         when header         =>
-          header_in               <= muart_output;
+          header_in <= muart_out;
           
         when inst_data_high =>
-          inst_data(15 downto 8)  <= muart_output;
+          inst_data_high_enable <= '1';
           
         when inst_data_low  =>
-          inst_data(7  downto 0)  <= muart_output;
+          inst_data_low_enable <= '1';
           
         when data_data      =>
-          data_data               <= muart_output;
-        
-        when clear_data     =>
-          data_data               <= (others <= 'Z');
+          data_data_enable <= '1';
+        when others =>
+          NULL;
       end case;
+    end process;
+    
+    data_line <= data_line_tri when data_add(0) = '1' else
+                 (others => 'Z');
+    
   end mmu_arch;
