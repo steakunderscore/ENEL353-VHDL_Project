@@ -60,106 +60,86 @@ architecture alu_arch of alu is
   signal   AdderCin  : std_logic;
   signal   Sum       : std_logic_vector(7 downto 0);
   signal   AdderCout : std_logic;
+  signal   Z,C,N     : std_logic; -- Make the code easier to read
+  signal   output    : std_logic_vector(7 downto 0); -- used to allow reading of ro
 BEGIN
   Adder: fulladder8 port map(A, B, AdderCin, Sum, AdderCout);
-  process(f, rx, ry, Cin)
-    variable output : std_logic_vector(7 downto 0); -- used to allow reading of ro
-    variable Z,C,N  : std_logic; -- Make the code easier to read
+  process(f, rx, ry, Cin, Sum, AdderCout)
+    --signal Z,C,N  : std_logic; -- Make the code easier to read
   BEGIN
     -- use case statement to achieve 
     -- different operations of ALU
 
-    case f(0) is
-      when '1' => -- '1' means that it is a arithmetic or logic function
-        case f(3) is --seperate the arithmetic and logic function
-          when '0' => -- It is a logic function
-            case f(2 downto 1) is
-              when "00" => -- Do AND operation
-                output := ry and rx;
-              when "01" => -- Do OR  operation
-                output := ry or rx;
-              when "10" => -- Do NOT operation
-                output := not rx;
-              when "11" => -- Do XOR operation
-                output := ry xor rx;
-              when others =>
-                output := (others => '0');
-            end case;
-            if (output = "00000000") then -- Set the Zero in status register
-              Z := '1';
-            ELSE
-              Z := '0';
-            end if;
-            C := '0'; -- Carry is always 0
-            N := output(7); -- This might need to be changed to '0'
-
-          when '1' => -- It is a arithmetic function
-            case f(2 downto 1) is
-              when "00" => -- Do ADD operation
-                AdderCin <= '0';
-                A <= ry;
-                B <= rx;
-                output := Sum;
-              when "01" => -- Do ADC operation
-                AdderCin <= Cin;
-                A <= ry;
-                B <= rx;
-                output := Sum;
-              when "10" => -- Do SUB operation
-                AdderCin <= '1';
-                A <= ry;
-                B <= (not rx);
-                output := Sum;
-              when "11" => -- Do SBB operation
-                AdderCin <= (not Cin);
-                A <= ry;
-                B <= (not rx);
-                output := Sum;
-              when others =>
-                output := (others => '0');
-            end case;
-            if output = "00000000" THEN
-              Z := '1';
-            else
-              Z := '0';
-            END IF;
-            C := AdderCout;
-            N := output(7);
-          when others =>
-            output := (others => '0');
-        end case;
-      when '0' => -- Non arithmetic or locic
-        case f(3 downto 1) is
-          when "010" => -- Do NEG operation ( two's complement )
-            AdderCin <= '1';
-            A <= (others => '0');
-            B <= (not rx);
-            output := Sum;
-            C := AdderCout;
-            N := output(7);
-          when "011" => -- Do CMP operation
-            AdderCin <= '1';
-            A <= rx;
-            B <= (not ry);
-            output := Sum;
-            C := AdderCout;
-            N := output(7);
-          when others =>
-            output := (others => '0');
-        end case;
-        if (output = "00000000") then
-          Z := '1';
-        else
-          Z := '0';
-        end if;
-      when others =>
-        output := (others => '0');
-    end case;  --  f(0)
-    ro <= output;
+      AdderCin <= '0';
+      A <= (others => '0');
+      B <= (others => '0');
+      output <= (others => '0');
+      C <= '0';
+      N <= '0';
+      IF f = "0001" THEN -- Do AND operation
+         output <= ry and rx;
+      ELSIF f = "0011" THEN -- Do OR  operation
+        output <= ry or rx;
+      ELSIF f = "0101" THEN
+        output <= not rx;
+      ELSIF f = "0111" THEN -- Do XOR operation
+        output <= ry xor rx;
+      ELSIF f = "1001" THEN -- Do ADD operation
+        AdderCin <= '0';
+        A <= ry;
+        B <= rx;
+        output <= Sum;
+      ELSIF f = "1011" THEN -- Do ADC operation
+        AdderCin <= Cin;
+        A <= ry;
+        B <= rx;
+        output <= Sum;
+      ELSIF f = "1101" THEN -- Do SUB operation
+        AdderCin <= '1';
+        A <= ry;
+        B <= (not rx);
+        output <= Sum;
+      ELSIF f = "1111" THEN -- Do SBB operation
+        AdderCin <= (not Cin);
+        A <= ry;
+        B <= (not rx);
+        output <= Sum;
+      ELSIF f = "0100" THEN -- Do NEG operation ( two's complement )
+        AdderCin <= '1';
+        A <= (others => '0');
+        B <= (not rx);
+        output <= Sum;
+        C <= AdderCout;
+        N <= output(7);
+      ELSIF f = "0110" THEN -- Do CMP operation
+        AdderCin <= '1';
+        A <= rx;
+        B <= (not ry);
+        output <= Sum;
+        C <= AdderCout;
+        N <= output(7);
+      ELSE
+        AdderCin <= '0';
+        A <= (others => '0');
+        B <= (others => '0');
+        output <= (others => '0');
+        C <= '0';
+        N <= '0';
+      END IF;
+--    if (output = "00000000") then -- Set the Zero in status register
+--      sr(0) <= '1';
+--    ELSE
+--      sr(0) <= '0';
+--    end if;
+      
+      C <= AdderCout; -- Carry is always 0
+      N <= output(7); -- This might need to be changed to '0'
+      ro <= output;
+  end process;
+    Z <= not (output(0) AND output(1) AND output(2) AND output(3) AND output(4)
+              AND output(5) AND output(6) AND output(7));
     sr(0) <= Z; --Z(0)
     sr(1) <= C; --C(1)
     sr(2) <= N; --N(2)
 
-  end process;
 end alu_arch;
-
