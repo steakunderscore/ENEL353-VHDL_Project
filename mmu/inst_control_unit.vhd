@@ -172,8 +172,8 @@ begin
   
   -- Outputs
   with state select
-    output.inst_ack <= '0' when wait_clear,
-                       '1' when others;
+    output.inst_ack <= '1' when wait_clear,
+                       '0' when others;
   
   with state select
     output.inst_or_data <= '0' when idle,
@@ -184,7 +184,7 @@ begin
                     '0' when others;
   
 
-  output.muart_input <= idle          when transmitter_state /= set_data or transmitter_state /= trans_data else
+  output.muart_input <= idle          when transmitter_state /= set_data and transmitter_state /= trans_data else
                         header        when get_state = send_header         else
                         inst_add_high when get_state = send_add_high       else
                         inst_add_low  when get_state = send_add_low        else

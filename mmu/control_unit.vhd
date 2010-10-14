@@ -34,22 +34,31 @@ architecture mmu_control_unit_arch of mmu_control_unit is
     );
   end component;
 begin
-
-    inst_in.eoc          <= input.eoc;
-    inst_in.eot          <= input.eot;
-    inst_in.ready        <= input.ready;
-    inst_in.inst_req     <= input.inst_req;
-    inst_in.fr           <= input.fr;
-    inst_in.inst_or_data <= input.inst_or_data;
-    inst_in.rw           <= input.rw;
-
-
-    output.write <= inst_out.write;
-    output.inst_or_data <= inst_out.inst_or_data;
-    output.inst_ack <= inst_out.inst_ack;
-    output.muart_input <= inst_out.muart_input;
-    output.muart_output <= inst_out.muart_output;
-    
   data_cu : data_control_unit port map (data_in, data_out, clk);
   inst_cu : inst_control_unit port map (inst_in, inst_out, clk);
+
+  inst_in.eoc          <= input.eoc;
+  inst_in.eot          <= input.eot;
+  inst_in.ready        <= input.ready;
+  inst_in.inst_req     <= input.inst_req;
+  inst_in.fr           <= input.fr;
+  inst_in.inst_or_data <= input.inst_or_data;
+  inst_in.rw           <= input.rw;
+  
+  data_in.eoc          <= input.eoc;
+  data_in.eot          <= input.eot;
+  data_in.ready        <= input.ready;
+  data_in.data_read    <= input.data_read;
+  data_in.data_req     <= input.inst_req;
+  data_in.data_add_0   <= input.data_add_0;
+  data_in.fr           <= input.fr;
+  data_in.inst_or_data <= input.inst_or_data;
+  data_in.rw           <= input.rw;
+  
+  output.write <= inst_out.write or data_out.write;
+  output.inst_or_data <= inst_out.inst_or_data;
+  output.inst_ack <= inst_out.inst_ack;
+  output.data_ack <= data_out.data_ack;
+  output.muart_input  <= inst_out.muart_input  when inst_out.inst_or_data = '1' else data_out.muart_input;
+  output.muart_output <= inst_out.muart_output when inst_out.inst_or_data = '1' else data_out.muart_output;
 end mmu_control_unit_arch;
