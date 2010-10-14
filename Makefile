@@ -4,11 +4,11 @@
 # /usr/lib/ghdl/bin/ghdl --gen-makefile --ieee=mentor alu_tb
 
 GHDL=ghdl
-#GHDLFLAGS= --ieee=synopsys
-GHDLFLAGS= --ieee=mentor
+GHDLFLAGS= --ieee=synopsys
+#GHDLFLAGS= --ieee=mentor
 
 # Default target
-all: alu_tb alu buses cpu IO microprocessor mmu
+all: alu_tb alu cpu IO microprocessor mmu
 
 .PHONY: cleanall
 cleanall: clean
@@ -23,9 +23,6 @@ alu_tb: alu.o alu_tb.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 alu: alu.o
-	$(GHDL) -e $(GHDLFLAGS) $@
-
-buses: buses.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 cpu: cpu.o
@@ -72,9 +69,6 @@ alu_tb.o: processor/alu_tb.vhd alu.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 alu.o: processor/alu.vhd fulladder.o
-	$(GHDL) -a $(GHDLFLAGS) $<
-
-buses.o: buses.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 cpu.o: processor/cpu.vhd
