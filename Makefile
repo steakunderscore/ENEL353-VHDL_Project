@@ -4,6 +4,7 @@
 # /usr/lib/ghdl/bin/ghdl --gen-makefile --ieee=mentor alu_tb
 
 GHDL=ghdl
+#GHDLFLAGS= --ieee=synopsys
 GHDLFLAGS= --ieee=mentor
 
 # Default target
@@ -11,7 +12,7 @@ all: alu_tb alu buses cpu IO microprocessor mmu
 
 .PHONY: cleanall
 cleanall: clean
-	rm -f alu_tb alu gpr_tb gpr spr_tb spr fulladder fulladder8_tb
+	rm -f alu_tb alu gpr_tb gpr pc spr_tb sr fulladder fulladder8_tb
 
 .PHONY: clean
 clean:
@@ -54,10 +55,13 @@ microprocessor: microprocessor.o
 mmu: mmu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
+pc: spr.o reg.o
+	$(GHDL) -e $(GHDLFLAGS) $@
+
 spr_tb: spr.o spr_tb.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
-spr: spr.o reg.o
+sr: spr.o reg.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 reg: reg.o

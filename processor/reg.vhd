@@ -21,10 +21,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity reg8 is
-
 port(I      : in  std_logic_vector(7 downto 0);
      clock  : in  std_logic;
      enable : in  std_logic;
+     reset  : in  STD_LOGIC;
      Q      : out std_logic_vector(7 downto 0)
     );
 end reg8;
@@ -34,8 +34,9 @@ begin
 
   process(I, clock, enable)
   begin
-
-    if rising_edge(clock) then
+    IF reset = '1' THEN
+      Q <= (others => '0');
+    ELSIF rising_edge(clock) then
       if enable = '1' then
         Q <= I;
       end if;
@@ -46,14 +47,15 @@ begin
 end behv;
 
 --------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 
 entity reg16 is
-
 port(I      : in  std_logic_vector(15 downto 0);
      clock  : in  std_logic;
      enable : in  std_logic;
+     reset  : in  STD_LOGIC;
      Q      : out std_logic_vector(15 downto 0)
     );
 end reg16;
@@ -63,8 +65,9 @@ begin
 
   process(I, clock, enable)
   begin
-
-    if rising_edge(clock) then
+    IF reset = '1' THEN
+      Q <= (others => '0');
+    ELSIF rising_edge(clock) then
       if enable = '1' then
         Q <= I;
       end if;
