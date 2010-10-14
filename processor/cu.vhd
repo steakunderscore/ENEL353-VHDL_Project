@@ -194,6 +194,7 @@ BEGIN
 
     -- Addressing
     else
+      gpr_Insel <= '0';
 
       case opcode(12 downto 10) is
 
