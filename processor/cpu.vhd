@@ -61,14 +61,16 @@ begin
       );
     entity gpr(alu_arch)
       port map(
-        clk => clk,
-        enable
-        SelRx
-        SelRy
-        SelRi
-        Ri
-        Rx
-        Ry
+        clk    => clk,
+        enable 
+        SelRx  
+        SelRy  
+        SelRi  
+        SelIn  
+        RiCU   
+        RiCDB  
+        Rx     
+        Ry     
       );
     entity spr(alu_arch)
       port map(

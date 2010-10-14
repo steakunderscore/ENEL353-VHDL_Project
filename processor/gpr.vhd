@@ -29,7 +29,9 @@ entity gpr is
         SelRx    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Rx output selection value
         SelRy    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ry output selection value
         SelRi    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ri input selection value
-        Ri       : in   STD_LOGIC_VECTOR (7 downto 0);  -- The Ri input to GPR
+        SelIn    : in   STD_LOGIC;  -- Select where the input should be from the CU or CDB
+        RiCU     : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Control Unit
+        RiCDB    : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Common Data Bus
         Rx       : out  STD_LOGIC_VECTOR (7 downto 0);  -- The Rx output
         Ry       : out  STD_LOGIC_VECTOR (7 downto 0)); -- The Ry output
 end gpr;
@@ -40,10 +42,13 @@ architecture gpr_arch of gpr is
     port(I      : in  std_logic_vector(7 downto 0);
          clock  : in  std_logic;
          enable : in  std_logic;
+         reset  : in  std_logic;
          Q      : out std_logic_vector(7 downto 0)
         );
   end component;
 
+  signal  reset: std_logic := '0';
+  signal  input: std_logic_VECTOR (7 downto 0);
   signal  R0E  : std_logic;  -- Enable signals
   signal  R1E  : std_logic;
   signal  R2E  : std_logic;
@@ -61,14 +66,24 @@ architecture gpr_arch of gpr is
   signal  Q6   : std_logic_VECTOR (7 downto 0);
   signal  Q7   : std_logic_VECTOR (7 downto 0);
 BEGIN
-    reg_0 : reg8 port map(Ri, clk, R0E, Q0);
-    reg_1 : reg8 port map(Ri, clk, R1E, Q1);
-    reg_2 : reg8 port map(Ri, clk, R2E, Q2);
-    reg_3 : reg8 port map(Ri, clk, R3E, Q3);
-    reg_4 : reg8 port map(Ri, clk, R4E, Q4);
-    reg_5 : reg8 port map(Ri, clk, R5E, Q5);
-    reg_6 : reg8 port map(Ri, clk, R6E, Q6);
-    reg_7 : reg8 port map(Ri, clk, R7E, Q7);
+    reg_0 : reg8 port map(input, clk, R0E, reset, Q0);
+    reg_1 : reg8 port map(input, clk, R1E, reset, Q1);
+    reg_2 : reg8 port map(input, clk, R2E, reset, Q2);
+    reg_3 : reg8 port map(input, clk, R3E, reset, Q3);
+    reg_4 : reg8 port map(input, clk, R4E, reset, Q4);
+    reg_5 : reg8 port map(input, clk, R5E, reset, Q5);
+    reg_6 : reg8 port map(input, clk, R6E, reset, Q6);
+    reg_7 : reg8 port map(input, clk, R7E, reset, Q7);
+
+  -- Select where the input should come from
+    SelectInput: process(SelIn, RiCDB, RiCU)
+    BEGIN
+      IF SelIn = '1' THEN
+          input <= RiCDB;
+      ELSE
+        input <= RiCU;
+      END IF;
+    END process;
 
   -- Set Ri the input
   SetInput: process(clk, enable, SelRi)
