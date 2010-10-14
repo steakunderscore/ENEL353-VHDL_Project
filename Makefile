@@ -11,7 +11,7 @@ all: alu_tb alu buses cpu IO microprocessor mmu
 
 .PHONY: cleanall
 cleanall: clean
-	rm -f alu_tb alu gpr_tb gpr spr_tb spr
+	rm -f alu_tb alu gpr_tb gpr spr_tb spr fulladder fulladder8_tb
 
 .PHONY: clean
 clean:
@@ -31,6 +31,12 @@ cpu: cpu.o
 	$(GHDL) -e $(GHDLFLAGS) $@processor/cpu.vhd
 
 cu: cu.o
+	$(GHDL) -e $(GHDLFLAGS) $@
+
+fulladder8_tb: fulladder.o fulladder_tb.o
+	$(GHDL) -e $(GHDLFLAGS) $@
+
+fulladder: fulladder.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 gpr_tb: gpr.o gpr_tb.o
@@ -61,7 +67,7 @@ reg: reg.o
 alu_tb.o: processor/alu_tb.vhd alu.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-alu.o: processor/alu.vhd numeric_std.o
+alu.o: processor/alu.vhd fulladder.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 buses.o: buses.vhd
@@ -73,6 +79,12 @@ cpu.o: processor/cpu.vhd
 cu.o: processor/cu.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
+fulladder_tb.o: processor/fulladder_tb.vhd fulladder.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+fulladder.o: processor/fulladder.vhd
+	$(GHDL) -a $(GHDLFLAGS) $<
+
 gpr_tb.o: processor/gpr_tb.vhd gpr.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
@@ -80,9 +92,6 @@ gpr.o: processor/gpr.vhd reg.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 IO.o: IO.vhd
-	$(GHDL) -a $(GHDLFLAGS) $<
-
-numeric_std.o: processor/numeric_std.vhdl
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 microprocessor.o: microprocessor.vhd

@@ -26,22 +26,25 @@ architecture behav of fulladder8_tb is
     --  This process does the real job.
     process
     type pattern_type is record
-      A    : in   STD_LOGIC_VECTOR( 7 downto 0);
-      B    : in   STD_LOGIC_VECTOR( 7 downto 0);
-      Cin  : in   STD_LOGIC;
-      Sum  : out  STD_LOGIC_VECTOR( 7 downto 0);
-      Cout : out  STD_LOGIC;
+      A    :  STD_LOGIC_VECTOR( 7 downto 0);
+      B    :  STD_LOGIC_VECTOR( 7 downto 0);
+      Cin  :  STD_LOGIC;
+      Sum  :  STD_LOGIC_VECTOR( 7 downto 0);
+      Cout :  STD_LOGIC;
     end record;
   --  The patterns to apply.
   type pattern_array is array (natural range <>) of pattern_type;
   constant patterns : pattern_array :=
   -- A           B          Cin   Sum     Cout
   (("00000000", "00000000", '0', "00000000", '0'), --AND tests - 1ns
+   ("11111111", "11111111", '1', "11111111", '1'), --AND tests
    ("00000000", "00000000", '1', "00000001", '0'), --AND tests
-   --("11111111", "10101010", '0', "10101010", '0'), --AND tests
-   --("10000011", "10110010", '0', "10000010", '0'), --AND tests
-   --("00000011", "00110010", '0', "00000010", '0'), --AND tests
-   ("11111111", "11111111", '0', "00000000", '1')  --XOR tests
+   ("00000000", "11111111", '0', "11111111", '0'), --AND tests
+   ("11111111", "00000000", '0', "11111111", '0'), --AND tests
+   ("11111111", "00000000", '1', "00000000", '1'), --AND tests
+   ("10101010", "01010101", '0', "11111111", '0'), --AND tests
+   ("10101010", "01010101", '1', "00000000", '1'), --AND tests
+   ("11111111", "11111111", '0', "11111110", '1')  --XOR tests
   );
 begin
   --  Check each pattern.
