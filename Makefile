@@ -83,7 +83,7 @@ control_unit.o: mmu/control_unit.vhd mmu_types.o data_control_unit.o inst_contro
 cpu.o: processor/cpu.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-cu.o: processor/cu.vhd
+cu.o: processor/cu.vhd fulladder.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 data_control_unit.o: mmu/data_control_unit.vhd mmu_types.o

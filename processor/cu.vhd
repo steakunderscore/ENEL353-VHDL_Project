@@ -25,6 +25,7 @@ use ieee.std_logic_arith.all;
 
 
 library work;
+--use work.fulladder;
 --use work.cpu.ALL;
 
 -- Uncomment the following library declaration if using
@@ -146,7 +147,7 @@ BEGIN
 
   -- Process instruction
   -- Assumes all instructions are valid
-  process(state, opcode, gpr_Rx, sr_Ro, pc_Ro, ar_Ro, inst_data, inst_ack, data_data, data_ack
+  process(state, opcode, gpr_Rx, sr_Ro, pc_Ro, ar_Ro, inst_data, inst_ack, data_data, data_ack,
           rx, ry, ay, v, write_gpr, write_sr, write_pc, write_ar, write_memory)
   BEGIN
 
