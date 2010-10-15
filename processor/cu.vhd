@@ -117,7 +117,7 @@ architecture Behavioral of cu is
   signal ry : std_logic_vector(2 downto 0);
   signal ay : std_logic_vector(1 downto 0);
 
-  -- Indicate which registers need to be written to
+  -- Indicates what needs to be executed
   signal write_gpr    : std_logic;
   signal write_sr     : std_logic;
   signal write_pc     : std_logic;
@@ -146,7 +146,8 @@ BEGIN
 
   -- Process instruction
   -- Assumes all instructions are valid
-  process(state, opcode)
+  process(state, opcode, gpr_Rx, sr_Ro, pc_Ro, ar_Ro, inst_data, inst_ack, data_data, data_ack
+          rx, ry, ay, v, write_gpr, write_sr, write_pc, write_ar, write_memory)
   BEGIN
 
     case state is
