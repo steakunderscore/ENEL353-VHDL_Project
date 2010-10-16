@@ -32,7 +32,7 @@ end reg8;
 architecture behv of reg8 is
 begin
 
-  process(I, clock, enable)
+  process(I, clock, enable, reset)
   begin
     IF reset = '1' THEN
       Q <= (others => '0');

@@ -43,7 +43,7 @@ entity alu is
         ry  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input y (Ry)
         ro  : out  STD_LOGIC_VECTOR (7 downto 0);  -- Output Normaly (Ry)
         Cin : in   STD_LOGIC;                      -- Carry in
-        sr  : out  STD_LOGIC_VECTOR (2 downto 0)); -- Status register out Z(0), C(1), N(2)
+        sr  : out  STD_LOGIC_VECTOR (15 downto 0)); -- Status register out Z(0), C(1), N(2)
 end alu;
 
 
@@ -142,5 +142,6 @@ BEGIN
     sr(0) <= Z; --Z(0)
     sr(1) <= C; --C(1)
     sr(2) <= N; --N(2)
+    sr(15 downto 3) <= (others => '0');
 
 end alu_arch;
