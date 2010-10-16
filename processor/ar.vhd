@@ -40,6 +40,7 @@ architecture Behavioral of ar is
     port(I      : in  std_logic_vector(15 downto 0);
          clock  : in  std_logic;
          enable : in  std_logic;
+         reset  : in  std_logic;
          Q      : out std_logic_vector(15 downto 0)
         );
   end component;
@@ -52,9 +53,9 @@ architecture Behavioral of ar is
   signal  Q1    : std_logic_VECTOR (15 downto 0);
   signal  Q2    : std_logic_VECTOR (15 downto 0);
 BEGIN
-    reg_0 : reg16 port map(input, clk, R0E, Q0);
-    reg_1 : reg16 port map(input, clk, R1E, Q1);
-    reg_2 : reg16 port map(input, clk, R2E, Q2);
+    reg_0 : reg16 port map(input, clk, R0E, '0', Q0);
+    reg_1 : reg16 port map(input, clk, R1E, '0', Q1);
+    reg_2 : reg16 port map(input, clk, R2E, '0', Q2);
 
   SetInput: process(clk, enable, SelRi, Ri)
   BEGIN
@@ -76,7 +77,7 @@ BEGIN
   end process;
   
   -- Select if 1 or 2 Bytes is to be written and if
-  SetNumBytes: process(clk, Ri, SelRi, ByteInput, Sel8Bit, SelHighByte)
+  SetNumBytes: process(clk, Ri, SelRi, ByteInput, Sel8Bit, SelHighByte, Q0, Q1, Q2)
   BEGIN
     IF Sel8Bit = '0' THEN
       input <= Ri;
@@ -92,8 +93,8 @@ BEGIN
             input(7 downto 0) <= Q2(7 downto 0);
         END CASE;
       else
+        input(7 downto 0) <= ByteInput;
         case SelRi IS
-          input(7 downto 0) <= ByteInput;
           WHEN "00" =>
             input(15 downto 8) <= Q0(15 downto 8);
           WHEN "01" =>
@@ -102,6 +103,7 @@ BEGIN
             input(15 downto 8) <= Q2(15 downto 8);
         END CASE;
       END IF;
+    END IF;
   end process;
   
   -- Set the output Ro

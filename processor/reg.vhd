@@ -63,7 +63,7 @@ end reg16;
 architecture behv of reg16 is
 begin
 
-  process(I, clock, enable)
+  process(I, clock, enable, reset)
   begin
     IF reset = '1' THEN
       Q <= (others => '0');
