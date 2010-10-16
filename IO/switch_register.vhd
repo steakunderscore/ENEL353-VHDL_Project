@@ -12,7 +12,7 @@
 --
 -- Dependencies:
 --
--- Revision:
+-- Revision: Saturday, 16 Oct 2010 by Sasha 
 -- Revision 0.01 - File Created
 -- Additional Comments:
 --
@@ -25,19 +25,19 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 library work;
 
 ENTITY switch_reg IS
-PORT( D : IN STD_LOGIC;
-      reset, clk : IN STD_LOGIC;
-      Q : OUT STD_LOGIC);
+PORT( D 				: IN STD_LOGIC;
+      clk,enable	: IN STD_LOGIC;
+      Q 				: OUT STD_LOGIC);
 END switch_reg;
 
 ARCHITECTURE reg_arch OF switch_reg IS
 BEGIN
-     PROCESS(D, reset, clk)
+     PROCESS(D, enable, clk)
 	  BEGIN
-            IF reset = '1' THEN
-               Q <= '0';
-            ELSIF rising_edge(clk) THEN
-               Q <= D;
+            IF rising_edge(clk) THEN --Need else there???
+					IF enable = '1' THEN 
+						Q <= D;
+					END IF;
             END IF;
      END PROCESS;
 END reg_arch;

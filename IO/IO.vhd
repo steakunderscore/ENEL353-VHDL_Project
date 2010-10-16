@@ -12,7 +12,7 @@
 --
 -- Dependencies:
 --
--- Revision:
+-- Revision: Saturday 16 Oct 2010 by Sasha
 -- Revision 0.01 - File Created
 -- Additional Comments: 
 --
@@ -51,72 +51,117 @@ end IO;
 
 architecture Behavioral of IO is
 
-	signal led_state    				: std_logic_vector(7 DOWNTO 0);
-	signal enable       				: std_logic;
-	signal switch1_connection 		: std_logic;
-	signal switch1_output 			: std_logic;
-	signal switch1_state 			: std_logic;
 
-	COMPONENT debounce
-          PORT(clk, switch : IN STD_LOGIC;
-          switch_state: OUT STD_LOGIC);
-	END COMPONENT;
+signal led_state    			: std_logic_vector(7 DOWNTO 0);
+signal enable1      			: std_logic;
+signal switch1_connection 	: std_logic;
+signal switch1_output 		: std_logic;
+--signal switch1_state 		: std_logic;
 
-	COMPONENT switch_reg
-          PORT( D : IN STD_LOGIC;
-          reset, clk : IN STD_LOGIC;
-          Q : OUT STD_LOGIC);
-	END COMPONENT;
-	
-	COMPONENT led_io
-		PORT(
-				data_add		: IN 			std_logic_vector(15 DOWNTO 0);  	-- address lines --
-				data_data	: INOUT 		std_logic_vector(7 DOWNTO 0);  	-- data lines --
-				data_read	: INOUT 		std_logic;								-- pulled high for read, low for write --
-				data_req		: INOUT		std_logic;								-- pulled low to request bus usage --
-				data_ack		: INOUT		std_logic;								-- pulled high to inform request completion --
-				--
-				clock 		: IN			std_logic
-				);
-	END COMPONENT;
+signal enable2      			: std_logic;
+signal switch2_connection 	: std_logic;
+signal switch2_output 		: std_logic;
+--signal switch2_state 		: std_logic;
+
+
+COMPONENT debounce
+		 PORT(clk, switch : IN STD_LOGIC;
+				switch_state: OUT STD_LOGIC);
+END COMPONENT;
+
+COMPONENT switch_reg
+		 PORT( D 			: IN STD_LOGIC;
+				clk, enable	: IN STD_LOGIC;
+				Q 				: OUT STD_LOGIC);
+END COMPONENT;
+
+
+COMPONENT led_io
+	PORT(
+			data_add		: IN 			std_logic_vector(15 DOWNTO 0);  	-- address lines --
+			data_data	: INOUT 		std_logic_vector(7 DOWNTO 0);  	-- data lines --
+			data_read	: INOUT 		std_logic;								-- pulled high for read, low for write --
+			data_req		: INOUT		std_logic;								-- pulled low to request bus usage --
+			data_ack		: INOUT		std_logic;								-- pulled high to inform request completion --
+
+			clock 		: IN			std_logic
+			);
+END COMPONENT;
+
 
 
 BEGIN
-sw1_status: switch_reg PORT MAP(switch1_state,clk, clk, switch1_output); --!! reset --
-sw1_debouncer: debounce PORT MAP(clk, sw1,switch1_connection);
 
-led: led_io PORT MAP(data_add, data_data, data_read, data_req, data_ack, clk);
+sw1_debouncer: debounce PORT MAP(clk, sw1, switch1_connection);
+sw1_status: switch_reg PORT MAP(switch1_connection,clk, enable1, switch1_output); --!! reset --
 
- 
------------------------------------------------------------------------------------------------
---Check the buttons status
--- PROCESS(clk,data_bus, sw1, sw2)
- --   BEGIN
- --   IF rising_edge(clk) THEN
- --       IF sw1 = '1'  THEN
- --         -- store switch 1 status
-  --      ELSIF sw2 = '1' THEN
- --         -- store switch 2 status
- --       END IF;
 
- --   END IF;
- --   END PROCESS;
+sw2_debouncer: debounce PORT MAP(clk, sw2,switch2_connection);
+sw2_status: switch_reg PORT MAP(switch2_connection,clk, enable2, switch2_output); --!! reset --
 
- -- Checks for cpu request on button
- PROCESS(clk, data_read)
- BEGIN
-      IF rising_edge(clk) THEN
-         IF data_read = '1' THEN
-            IF data_add = "0000000000000010" THEN
-               data_data <= "11111111";
-            ELSIF data_add = "0000000000000100" THEN
-               -- send button 2 status
 
-            END IF;
-         END IF;
-      END IF;
+
+PROCESS(switch1_output,switch2_output, data_ack)
+BEGIN
+IF rising_edge(clk) THEN
+	IF switch1_output = '1' AND data_ack = 'Z' THEN --when the switch_reg has stored 1, disable switch_reg from getting any more info
+		enable1 <= '0';
+	
+	--ELSIF data_ack = '0' AND data_add = "0000000000001110" THEN -- when the data is sent to the CPU, enable the switch_reg again
+	--	enable1 <= '1';
+	ELSE
+		enable1 <= '1';
+	END IF;
+	
+	IF switch2_output = '1' AND data_ack = 'Z' THEN --when the switch_reg has stored 1, disable switch_reg from getting any more info
+		enable2 <= '0';
+	
+	--ELSIF data_ack = '0' AND data_add = "0000000000001100" THEN -- when the data is sent to the CPU, enable the switch_reg again
+	--	enable2 <= '1';
+	ELSE
+		enable2 <= '1';
+	END IF;
+	
+	
+END IF;
+END PROCESS;
+
+
+
+
+
+
+
+PROCESS(clk, data_add, data_read)
+BEGIN
+	IF rising_edge(clk) THEN
+		IF data_req = '0' AND data_read = '1' THEN
+			IF data_add = "0000000000001110" THEN -- switch1 address
+				IF switch1_output = '1' THEN
+					data_data <= "00000001";
+				ELSE
+					data_data <= "00000000";
+				END IF;
+				data_ack <= '0';
+			END IF;
+			IF data_add = "0000000000001100" THEN -- switch2 address
+				IF switch2_output = '1' THEN
+					data_data <= "00000001";
+				ELSE
+					data_data <= "00000000";
+				END IF;
+				data_ack <= '0';
+			END IF;
+		ELSIF data_req = '1' AND data_ack = '0' THEN
+			data_ack <= 'Z';
+		END IF;
+	END IF;
  END PROCESS;
 
 
-END Behavioral;
 
+--led: led_io PORT MAP(data_add, data_data, data_read, data_req, data_ack, clk);
+
+----------------------------------------------------------------------------------------------- 
+	 
+END Behavioral;
