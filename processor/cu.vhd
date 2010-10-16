@@ -146,6 +146,9 @@ BEGIN
           next_state <= fetch;
 
         when fetch =>
+          sr_reset <= '1';
+          pc_reset <= '1';
+        
           gpr_en <= '0';
           sr_en <= '0';
           pc_en <= '0';
@@ -292,6 +295,7 @@ BEGIN
                         AdderCin16 <= '1';
                         A16 <= ar_Ro;
                         B16 <= "0000000000000000";
+                        ar_selRi <= ay;
                         ar_sel8bit <= '0';
                         ar_Ri <= Sum16;
                         write_ar <= '1';
@@ -299,6 +303,7 @@ BEGIN
                         AdderCin16 <= '0';
                         A16 <= ar_Ro;
                         B16 <= "1111111111111111";
+                        ar_selRi <= ay;
                         ar_sel8bit <= '0';
                         ar_Ri <= Sum16;
                         write_ar <= '1';
@@ -338,6 +343,7 @@ BEGIN
                       AdderCin16 <= '1';
                       A16 <= ar_Ro;
                       B16 <= "0000000000000000";
+                      ar_selRi <= ay;
                       ar_sel8bit <= '0';
                       ar_Ri <= Sum16;
                       write_ar <= '1';
@@ -345,6 +351,7 @@ BEGIN
                       AdderCin16 <= '0';
                       A16 <= ar_Ro;
                       B16 <= "1111111111111111";
+                      ar_selRi <= ay;
                       ar_sel8bit <= '0';
                       ar_Ri <= Sum16;
                       write_ar <= '1';
@@ -361,7 +368,7 @@ BEGIN
 
                   -- ayn <- rx
                   gpr_selRx <= rx;
-                  ar_selRo <= ay;
+                  ar_selRi <= ay;
                   ar_sel8bit <= '1';
                   ar_ByteIn <= gpr_Rx;
 
@@ -413,7 +420,7 @@ BEGIN
 
           end if;
 
-        when others =>  -- execute
+        when execute =>
           gpr_en <= write_gpr;
           sr_en <= write_sr;
           pc_en <= write_pc;
@@ -428,6 +435,10 @@ BEGIN
           else
             next_state <= fetch;
           end if;
+          
+        when others =>
+          -- shouldnt reach here
+          next_state <= reset_state;
       end case;
     end if;
   end process;
