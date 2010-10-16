@@ -23,7 +23,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
-use work.buses.ALL;
+use work.alu;
+use work.cu;
+use work.ar;
+use work.gpr;
+use work.sr;
+use work.pc;
+
 
 ---- Uncomment the following library declaration if instantiating
 ---- any Xilinx primitives in this code.
@@ -154,15 +160,15 @@ architecture cpu_arch of cpu is
   signal sr_enable  : std_logic;
 
   signal ar_enable  : std_logic;
-  signal ar_SelRi   : std_logic(2 downto 0);
-  signal ar_SelRo   : std_logic(2 downto 0);
-  signal ar_Ri      : std_logic(15 downto 0);
-  signal ar_Ro      : std_logic(15 downto 0);
+  signal ar_SelRi   : std_logic_vector(2 downto 0);
+  signal ar_SelRo   : std_logic_vector(2 downto 0);
+  signal ar_Ri      : std_logic_vector(15 downto 0);
+  signal ar_Ro      : std_logic_vector(15 downto 0);
 
   signal pc_reset   : std_logic;
   signal pc_enable  : std_logic;
-  signal pc_Ri      : std_logic(15 downto 0);
-  signal pc_Ro      : std_logic(15 downto 0);
+  signal pc_Ri      : std_logic_vector(15 downto 0);
+  signal pc_Ro      : std_logic_vector(15 downto 0);
 
   signal gpr_InSel  : std_logic;
   signal gpr_enable : std_logic;
@@ -172,17 +178,16 @@ architecture cpu_arch of cpu is
   signal gpr_RiCU   : std_logic_vector(7 downto 0);
 begin
 
-entity alu(alu_arch)
-  port map(
+  a: alu port map(
             f    => alu_f,
             rx   => alu_rx,
             ry   => alu_ry,
             ro   => gpr_RiCDB,
             Cin  => ,
             sr   => sr_input,
-          );
-entity cu(cu_arch)
-  port map(
+           );
+  c: cu port map(
+
             reset     => reset,-- '0' for reset
             clock     => clk,-- clock
 
@@ -229,8 +234,7 @@ entity cu(cu_arch)
             data_req  => data_req ,-- Request
             data_ack  => data_ack ,-- Data written to/ read from
           );
-entity ar(ar_arch)
-  port map(
+  a: ar port map(
             clk         => clk,
             enable      => ar_enable,
             --Sel8Bit     => 
@@ -241,8 +245,7 @@ entity ar(ar_arch)
             Ri          => ar_Ri,
             Ro          => ar_Ro
           );
-entity gpr(gpr_arch)
-  port map(
+gpr: gpr port map(
             clk    => clk,
             enable => gpr_enable,
             SelRx  => gpr_SelRx,
@@ -254,16 +257,14 @@ entity gpr(gpr_arch)
             Rx     => alu_rx,
             Ry     => alu_ry
           );
-entity sr(sr_arch)
-  port map(
+sr: sr port map(
             clk    => clk,
             enable => sr_enable,
             reset  => sr_reset,
             Ri     => sr_input
             Ro     => 
             );
-entity pc(pc_arch)
-  port map(
+pc: pc port map(
             clk     => clk,
             enable  => pc_enable
             reset   => pc_reset,
