@@ -31,6 +31,9 @@ cpu: cpu.o
 cu: cu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
+data_tb: data_tb.o mmu_main.o txt_util.o IO.o
+	$(GHDL) -e $(GHDLFLAGS) $@
+
 fulladder8_tb: fulladder.o fulladder_tb.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
@@ -86,7 +89,13 @@ cpu.o: processor/cpu.vhd
 cu.o: processor/cu.vhd fulladder.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
+data_tb.o: data_tb.vhd mmu_main.o IO.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
 data_control_unit.o: mmu/data_control_unit.vhd mmu_types.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+debounce.o: IO/debounce.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 fulladder_tb.o: processor/fulladder_tb.vhd fulladder.o
@@ -110,7 +119,10 @@ header_decoder.o: mmu/header_decoder.vhd
 inst_control_unit.o: mmu/inst_control_unit.vhd mmu_types.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-IO.o: IO.vhd
+IO.o: IO/IO.vhd debounce.o switch_reg.o led_io.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+led_io.o: IO/leds.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 microprocessor.o: microprocessor.vhd
@@ -132,6 +144,9 @@ spr_tb.o: processor/spr_tb.vhd spr.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 spr.o: processor/spr.vhd reg.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
+switch_reg.o: IO/switch_register.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 txt_util.o: txt_util.vhd

@@ -19,7 +19,7 @@ entity mmu_control_unit is
      write        : out std_logic; -- High to start muart writing data.
      inst_or_data_out : out std_logic; -- High if current output packet is an instruction packet.
      inst_ack     : out std_logic; -- Low when the inst is ready to be read by CPU. High otherwise.
-     data_ack     : out std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
+     data_ack     : inout std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
      muart_input  : out muart_input_state; -- State to multiplex the muart's input
      muart_output : out muart_output_state; -- State to multiplex the muart's output.
     clk    : in  std_logic
@@ -36,7 +36,7 @@ architecture mmu_control_unit_arch of mmu_control_unit is
      data_req     : in std_logic; -- Low when the data address is valid and should be read.
      data_add_0   : in std_logic; -- High for memory address, not IO.
      write        : out std_logic; -- High to start muart writing data.
-     data_ack     : out std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
+     data_ack     : inout std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
      muart_input  : out muart_input_state; -- State to multiplex the muart's input
      muart_output : out muart_output_state; -- State to multiplex the muart's output.
     clk    : in  std_logic

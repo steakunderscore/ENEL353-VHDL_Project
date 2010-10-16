@@ -46,7 +46,7 @@ use work.minimal_uart_core;
         write        : out std_logic; -- High to start muart writing data.
         inst_or_data_out : out std_logic; -- High if current output packet is an instruction packet.
         inst_ack     : out std_logic; -- Low when the inst is ready to be read by CPU. High otherwise.
-        data_ack     : out std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
+        data_ack     : inout std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
         muart_input  : out muart_input_state; -- State to multiplex the muart's input
         muart_output : out muart_output_state; -- State to multiplex the muart's output.
         clk    : in  std_logic
@@ -129,8 +129,8 @@ use work.minimal_uart_core;
       muart_in <=  header_out                               when header,
                    "0000" & inst_add(11 downto 8)           when inst_add_high,
                    inst_add(7  downto 0)                    when inst_add_low,
-                   '0' & data_add(14 downto 8)              when data_add_high,
-                   data_add(7  downto 0)                    when data_add_low,
+                   '0' & data_add(15 downto 9)              when data_add_high,
+                   data_add(8  downto 1)                    when data_add_low,
                    data_line                                when data_data,
                    (others => '0')                          when others;
     
@@ -156,7 +156,7 @@ use work.minimal_uart_core;
       end case;
     end process;
     
-    data_line <= data_line_tri when data_add(0) = '1' else
+    data_line <= data_line_tri when data_add(0) = '1' and data_read = '1' else
                  (others => 'Z');
     
   end mmu_arch;

@@ -13,7 +13,7 @@ entity data_control_unit is
      data_req     : in std_logic; -- Low when the data address is valid and should be read.
      data_add_0   : in std_logic; -- High for memory address, not IO.
      write        : out std_logic; -- High to start muart writing data.
-     data_ack     : out std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
+     data_ack     : inout std_logic; -- Low when the data is ready to be read by CPU. High impedance otherwise.
      muart_input  : out muart_input_state; -- State to multiplex the muart's input
      muart_output : out muart_output_state; -- State to multiplex the muart's output.
     clk    : in  std_logic
@@ -28,27 +28,27 @@ architecture data_control_unit_arch of data_control_unit is
                         finished);
   type read_state_type is (idle, wait_data, read_data, pause, finished);
   type transmit_state_type is (idle, set_data, trans_data, pause, finished);
-  signal state : state_type := idle;
-  signal get_state : m_state_type := idle;
-  signal reader_state : read_state_type := idle;
-  signal transmitter_state : transmit_state_type := idle;
+  signal state, next_state : state_type := idle;
+  signal get_state, next_get_state : m_state_type := idle;
+  signal reader_state, next_reader_state : read_state_type := idle;
+  signal transmitter_state, next_transmitter_state : transmit_state_type := idle;
 begin
   data_fsm : process(state, data_req, clk) begin
     if (rising_edge(clk)) then
       case state is
         when idle =>
           if (data_req = '0' and data_add_0 = '1') then
-            state <= get_data;
+            next_state <= get_data;
           end if;
         
         when get_data =>
           if (get_state = finished) then
-            state <= wait_clear;
+            next_state <= wait_clear;
           end if;
         
         when wait_clear =>
           if (data_req = '1') then
-            state <= idle;
+            next_state <= idle;
           end if;
         
         when others =>
@@ -62,54 +62,54 @@ begin
       if state = get_data then
         case get_state is
           when idle =>
-            get_state <= send_header;
+            next_get_state <= send_header;
           
           when send_header =>
             if transmitter_state = finished then
-              get_state <= send_add_low;
+              next_get_state <= send_add_low;
             end if;
           
           when send_add_low =>
             if transmitter_state = finished then
-              get_state <= send_add_high;
+              next_get_state <= send_add_high;
             end if;
           
           when send_add_high =>
             if transmitter_state = finished then
               if data_read = '1' then
-                get_state <= get_header;
+                next_get_state <= get_header;
               else
-                get_state <= send_data;
+                next_get_state <= send_data;
               end if;
             end if;
           
           when send_data =>
             if transmitter_state = finished then
-              get_state <= finished;
+              next_get_state <= finished;
             end if;
           
           when get_header =>
             if reader_state = finished then
-              get_state <= get_add_low;
+              next_get_state <= get_add_low;
             end if;
             
           when get_add_low =>
             if reader_state = finished then
-              get_state <= get_add_high;
+              next_get_state <= get_add_high;
             end if;
             
           when get_add_high =>
             if reader_state = finished then
-              get_state <= get_data;
+              next_get_state <= get_data;
             end if;
             
           when get_data =>
             if reader_state = finished then
-              get_state <= finished;
+              next_get_state <= finished;
             end if;
           
           when finished =>
-            get_state <= idle;
+            next_get_state <= idle;
           
           when others =>
             NULL;
@@ -122,26 +122,27 @@ begin
     if rising_edge(clk) then
       if ((get_state = send_header) or
           (get_state = send_add_low) or
-          (get_state = send_add_high)) then
+          (get_state = send_add_high) or
+          (get_state = send_data)) then
         case transmitter_state is
           when idle =>
-            if ready = '1' then
-              transmitter_state <= set_data;
+          if ready = '1' and eot = '0' then
+              next_transmitter_state <= set_data;
             end if;
           
           when set_data =>
-            transmitter_state <= trans_data;
+            next_transmitter_state <= trans_data;
           
           when trans_data =>
-            transmitter_state <= pause;
+            next_transmitter_state <= pause;
           
           when pause =>
             if eot = '1' then
-              transmitter_state <= finished;
+              next_transmitter_state <= finished;
             end if;
           
           when finished =>
-            transmitter_state <= idle;
+            next_transmitter_state <= idle;
         
           when others =>
             NULL;
@@ -158,23 +159,23 @@ begin
           (get_state = get_data)) then
         case reader_state is
           when idle =>
-            reader_state <= wait_data;
+            next_reader_state <= wait_data;
           
           when wait_data =>
             if eoc = '1' then
-              reader_state <= read_data;
+              next_reader_state <= read_data;
             end if;
           
           when read_data =>
-            reader_state <= pause;
+            next_reader_state <= pause;
           
           when pause =>
             if eoc = '0' then
-              reader_state <= finished;
+              next_reader_state <= finished;
             end if;
           
           when finished =>
-            reader_state <= idle;
+            next_reader_state <= idle;
         
           when others =>
             NULL;
@@ -182,6 +183,15 @@ begin
       end if;
     end if;
   end process read_fsm;
+
+  switch_states : process(clk, next_state, next_get_state, next_reader_state, next_transmitter_state) begin
+    if rising_edge(clk) then
+      state <= next_state;
+      get_state <= next_get_state;
+      reader_state <= next_reader_state;
+      transmitter_state <= next_transmitter_state;
+    end if;
+  end process switch_states;
   
   -- Outputs
   with state select
@@ -203,6 +213,6 @@ begin
  muart_output <= clear_data when state = idle              else
                         idle       when reader_state /= read_data else
                         header     when get_state = get_header    else
-                         data_data  when get_state = get_data      else
-                         idle;
+                        data_data  when get_state = get_data      else
+                        idle;
 end data_control_unit_arch;
