@@ -52,13 +52,107 @@ entity cpu is
 end cpu;
 
 architecture cpu_arch of cpu is
+  component alu IS
+    Port (f   : in   STD_LOGIC_VECTOR (3 downto 0);  -- Function (opcode)
+          rx  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input x (Rx)
+          ry  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input y (Ry)
+          ro  : out  STD_LOGIC_VECTOR (7 downto 0);  -- Output Normaly (Ry)
+          Cin : in   STD_LOGIC;                      -- Carry in
+          sr  : out  STD_LOGIC_VECTOR (2 downto 0)); -- Status register out Z(0), C(1), N(2)
+  END alu;
+  component ar is
+    Port (clk         : in   STD_LOGIC;
+          enable      : in   STD_LOGIC;
+          Sel8Bit     : in   STD_LOGIC;
+          SelHighByte : in   STD_LOGIC;
+          ByteInput   : in   STD_LOGIC_VECTOR (7 downto 0);
+          SelRi       : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
+          SelRo       : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
+          Ri          : in   STD_LOGIC_VECTOR (15 downto 0);  -- The input
+          Ro          : out  STD_LOGIC_VECTOR (15 downto 0)); -- The output
+  end ar;
+  component cu is
+    Port (reset       : in STD_LOGIC;                       -- '0' for reset
+          clock       : in STD_LOGIC;                       -- clock
+
+          alu_f       : out STD_LOGIC_VECTOR (3 downto 0);  -- Function
+
+        -- General Purpose Registers
+          gpr_InSel   : out STD_LOGIC;                      -- select the input path (0 - cu, 1 - ALU)
+          gpr_en      : out STD_LOGIC;                      -- enable write to GPR
+          gpr_SelRx   : out STD_LOGIC_VECTOR (2 downto 0);  -- select GPR output x
+          gpr_SelRy   : out STD_LOGIC_VECTOR (2 downto 0);  -- select GPR output y
+          gpr_SelRi   : out STD_LOGIC_VECTOR (2 downto 0);  -- select GPR input
+          gpr_Ri      : out STD_LOGIC_VECTOR (7 downto 0);  -- input to GPR
+          gpr_Rx      : in STD_LOGIC_VECTOR (7 downto 0);   -- Rx from GPR
+          gpr_Ry      : in STD_LOGIC_VECTOR (7 downto 0);   -- Ry from GPR
+
+        -- Status Register
+          sr_en       : out STD_LOGIC;                      -- enable write to SR
+          sr_reset    : out STD_LOGIC;                      -- reset SR
+          sr_Ro       : in STD_LOGIC_VECTOR (15 downto 0);  -- output from SR
+                                                            -- control unit doesnt write to SR, the ALU does
+
+        -- Program Counter
+          pc_en       : out STD_LOGIC;                      -- enable write to PC
+          pc_reset    : out STD_LOGIC;                      -- reset PC
+          pc_Ri       : out STD_LOGIC_VECTOR (15 downto 0); -- input to PC
+          pc_Ro       : in STD_LOGIC_VECTOR (15 downto 0);  -- output from PC
+
+        -- Address Registers
+          ar_en       : out STD_LOGIC;                      -- enable write to AR
+          ar_SelRi    : out STD_LOGIC_VECTOR (1 downto 0);  -- select AR in
+          ar_SelRo    : out STD_LOGIC_VECTOR (1 downto 0);  -- select AR out
+          ar_Ri       : out STD_LOGIC_VECTOR (15 downto 0); -- input to AR
+          ar_Ro       : in STD_LOGIC_VECTOR (15 downto 0);  -- output from AR
+
+        -- Instruction memory
+          inst_add    : out STD_LOGIC_VECTOR (11 downto 0); -- Instruction address
+          inst_data   : in STD_LOGIC_VECTOR (15 downto 0);  -- Instruction data
+          inst_req    : out STD_LOGIC;                      -- Request 
+          inst_ack    : in STD_LOGIC;                       -- Instruction obtained
+
+          data_add    : out STD_LOGIC_VECTOR (15 downto 0); -- Data address
+          data_data   : inout STD_LOGIC_VECTOR (7 downto 0);-- Data
+          data_read   : out STD_LOGIC;                      -- 1 for read, 0 for write
+          data_req    : out STD_LOGIC;                      -- Request
+          data_ack    : in STD_LOGIC                        -- Data written to/ read from
+
+        );
+  end cu;
+  component gpr is
+    Port (clk      : in   STD_LOGIC;
+          enable   : in   STD_LOGIC;
+          SelRx    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Rx output selection value
+          SelRy    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ry output selection value
+          SelRi    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ri input selection value
+          SelIn    : in   STD_LOGIC;  -- Select where the input should be from the CU or CDB
+          RiCU     : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Control Unit
+          RiCDB    : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Common Data Bus
+          Rx       : out  STD_LOGIC_VECTOR (7 downto 0);  -- The Rx output
+          Ry       : out  STD_LOGIC_VECTOR (7 downto 0)); -- The Ry output
+  end gpr;
+  component sr is
+    Port (clk      : in  STD_LOGIC;
+          enable   : in  STD_LOGIC;
+          reset    : in  STD_LOGIC;
+          Ri       : in  STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SR
+          Ro       : out STD_LOGIC_VECTOR (15 downto 0)); -- The output from SR
+  end sr;
+  component pc is
+    Port (clk      : in  STD_LOGIC;
+          enable   : in  STD_LOGIC;
+          reset    : in  STD_LOGIC;
+          Ri       : in  STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SR
+          Ro       : out STD_LOGIC_VECTOR (15 downto 0)); -- The output from SR
+  end pc;
   signal alu_f      : std_logic;
   signal alu_rx     : std_logic_vector(7 downto 0);
   signal alu_ry     : std_logic_vector(7 downto 0);
-  
+
   signal sr_reset   : std_logic;
   signal sr_enable  : std_logic;
-  
+
   signal ar_enable  : std_logic;
   signal ar_SelRi   : std_logic(2 downto 0);
   signal ar_SelRo   : std_logic(2 downto 0);
@@ -69,7 +163,7 @@ architecture cpu_arch of cpu is
   signal pc_enable  : std_logic;
   signal pc_Ri      : std_logic(15 downto 0);
   signal pc_Ro      : std_logic(15 downto 0);
-  
+
   signal gpr_InSel  : std_logic;
   signal gpr_enable : std_logic;
   signal gpr_SelRx  : std_logic_vector(2 downto 0);
@@ -86,7 +180,7 @@ entity alu(alu_arch)
             ro   => gpr_RiCDB,
             Cin  => ,
             sr   => sr_input,
-);
+          );
 entity cu(cu_arch)
   port map(
             reset     => reset,-- '0' for reset
@@ -146,7 +240,7 @@ entity ar(ar_arch)
             SelRo       => ar_SelRo,
             Ri          => ar_Ri,
             Ro          => ar_Ro
-            );
+          );
 entity gpr(gpr_arch)
   port map(
             clk    => clk,
@@ -167,7 +261,7 @@ entity sr(sr_arch)
             reset  => sr_reset,
             Ri     => sr_input
             Ro     => 
-           );
+            );
 entity pc(pc_arch)
   port map(
             clk     => clk,
