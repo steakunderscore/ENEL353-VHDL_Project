@@ -38,7 +38,7 @@ def immediate(chunk, symbols=nil, move_from=nil)
     return diff
   else
     assert(chunk + " is not a valid immediate") {v >= -127 && v < 128}
-    if v < 1
+    if v < 0
       v = twos_complement(v)
     end
     return v

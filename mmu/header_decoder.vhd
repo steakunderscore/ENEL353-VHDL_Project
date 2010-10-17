@@ -1,3 +1,6 @@
+-- Author:
+--      Forrest McKerchar
+
 -- decodes a header received from the RS-232 link
 
 library IEEE;

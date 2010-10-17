@@ -1,3 +1,6 @@
+-- Author:
+--      Forrest McKerchar
+
 -- builds a header to feed into the RS-232 link
 
 library IEEE;

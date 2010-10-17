@@ -1,56 +1,53 @@
-\documentclass[a4paper, 12pt, titlepage, openany]{report}
+\documentclass[a4paper, 12pt]{report}
 \usepackage[top=1in,right=2.5cm,left=2.5cm,bottom=1in]{geometry}
-\usepackage[usenames,dvipsnames]{color}
-\usepackage{listings}
-\usepackage{caption}
+\usepackage{color, listings, caption}
 
 \definecolor{darkgreen}{rgb}{0,0.5,0}
+\lstset{ %
+  language=VHDL,                     % choose the language of the code
+  basicstyle=\scriptsize\ttfamily,       % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny,        % the size of the fonts that are used for the line-numbers
+  stepnumber=2,                   % the step between two line-numbers. If it's 1 each line will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  keywordstyle=\color{blue},
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{red},
+  extendedchars=true,
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  escapeinside={(*@}{@*)},        % allow referencing in the code
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=b,                   % adds a frame around the code
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=t,                   % sets the caption-position to bottom
+  breaklines=true,               % sets automatic line breaking
+  breakatwhitespace=true,        % sets if automatic breaks should only happen at whitespace
+  caption=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+  xleftmargin=17pt,
+  framexleftmargin=17pt,
+  framexrightmargin=5pt,
+  framexbottommargin=4pt,
+}
 
-
-  \lstset{ %
-    language=VHDL,                     % choose the language of the code
-    basicstyle=\scriptsize\ttfamily,       % the size of the fonts that are used for the code
-    numbers=left,                   % where to put the line-numbers
-    numberstyle=\tiny,        % the size of the fonts that are used for the line-numbers
-    stepnumber=2,                   % the step between two line-numbers. If it's 1 each line will be numbered
-    numbersep=5pt,                  % how far the line-numbers are from the code
-    backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
-    keywordstyle=\color{blue},
-    commentstyle=\color{darkgreen},
-    stringstyle=\color{red},
-    extendedchars=true,
-    showspaces=false,               % show spaces adding particular underscores
-    showstringspaces=false,         % underline spaces within strings
-    escapeinside={(*@}{@*)},        % allow referencing in the code
-    showtabs=false,                 % show tabs within strings adding particular underscores
-    frame=b,                   % adds a frame around the code
-    tabsize=2,                      % sets default tabsize to 2 spaces
-    captionpos=t,                   % sets the caption-position to bottom
-    breaklines=true,               % sets automatic line breaking
-    breakatwhitespace=true,        % sets if automatic breaks should only happen at whitespace
-    caption=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
-    xleftmargin=17pt,
-    framexleftmargin=17pt,
-    framexrightmargin=5pt,
-    framexbottommargin=4pt,
-  }
-  
-  \DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFont{white}{\color{white}}
 \DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
 \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
 
-
 \begin{document}
-  \section{Listings}
-    \subsection{Main}
+  \chapter*{Listings}
+    \section*{Main}
       \lstinputlisting{main.vhd}
-    \subsection{IO}
+    \newpage
+    \section*{IO}
       \lstinputlisting{IO/debounce.vhd}
       \lstinputlisting{IO/IO.vhd}
       \lstinputlisting{IO/leds.vhd}
       \lstinputlisting{IO/switch_register.vhd}
       \lstinputlisting{IO/switches.vhd}
-    \subsection{CPU}
+    \newpage
+    \section*{CPU}
       \lstinputlisting{processor/alu.vhd}
       \lstinputlisting{processor/ar.vhd}
       \lstinputlisting{processor/cpu.vhd}
@@ -59,7 +56,8 @@
       \lstinputlisting{processor/gpr.vhd}
       \lstinputlisting{processor/reg.vhd}
       \lstinputlisting{processor/spr.vhd}
-    \subsection{MMU}
+    \newpage
+    \section*{MMU}
       \lstinputlisting{mmu/control_unit.vhd}
       \lstinputlisting{mmu/data_control_unit.vhd}
       \lstinputlisting{mmu/header_builder.vhd}
@@ -69,14 +67,16 @@
       \lstinputlisting{mmu/mmu_types.vhd}
       \lstinputlisting{mmu/muart/BRG.vhd}
       \lstinputlisting{mmu/muart/serial.vhd}
-    \subsection{Test Benchs}
+    \newpage
+    \section*{Test Benchs}
       \lstinputlisting{processor/alu_tb.vhd}
       \lstinputlisting{processor/fulladder_tb.vhd}
       \lstinputlisting{processor/spr_tb.vhd}
       \lstinputlisting{processor/gpr_tb.vhd}
       \lstinputlisting{mmu/mmu_tb.vhd}
       \lstinputlisting{data_tb.vhd}
-    \subsection{Tools}
+    \newpage
+    \section*{Tools}
       \lstinputlisting[language=Ruby]{assembler.rb}
       \lstinputlisting[language=Ruby]{memory.rb}
 \end{document}

@@ -1,3 +1,6 @@
+-- Authors:
+--      Wim Looman, Forrest McKerchar, Henry Jenkins, Joel Koh, Sasha Wang, Tracy Jackson
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
