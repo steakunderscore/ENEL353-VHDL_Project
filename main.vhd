@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 library work;
 
-entity everything is
+entity main is
   port (
         clk   : in  std_logic;
         reset : in  std_logic;
@@ -12,9 +12,9 @@ entity everything is
         sw1   : in  std_logic;
         sw2   : in  std_logic
   );
-end everything;
+end main;
 
-architecture everything_arch of everything is
+architecture main_arch of main is
   component cpu IS
     PORT(
       -- instruction bus
@@ -123,4 +123,4 @@ architecture everything_arch of everything is
             sw1         => sw1,
             sw2         => sw2
       );
-end architecture everything_arch;
+end architecture main_arch;
