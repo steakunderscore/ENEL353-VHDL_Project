@@ -421,18 +421,22 @@ BEGIN
           end if;
 
         when execute =>
-          gpr_en <= write_gpr;
-          sr_en <= write_sr;
-          pc_en <= write_pc;
-          ar_en <= write_ar;
           if write_memory = '1' then
             if data_ack = '0' then  -- request write
               data_req <= '1';
             else                    -- data written
               data_req <= '0';
+			  gpr_en <= write_gpr;
+			  sr_en <= write_sr;
+			  pc_en <= write_pc;
+			  ar_en <= write_ar;
               next_state <= fetch;
             end if;
           else
+			gpr_en <= write_gpr;
+			sr_en <= write_sr;
+			pc_en <= write_pc;
+			ar_en <= write_ar;
             next_state <= fetch;
           end if;
           
