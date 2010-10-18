@@ -1,22 +1,6 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:  18:59:20 09/18/2010 
--- Design Name: 
--- Module Name:  fulladder - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
-----------------------------------------------------------------------------------
+-- Authors:
+--      Henry Jenkins, Joel Koh
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
