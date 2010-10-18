@@ -24,7 +24,8 @@ def serve(program, data_file, sp)
         sp.putc(header)
         instruction ? sp.write(program[address]) :
                       sp.write(data_file[address])
-        p "Sending data for " + instruction ? "Instruction" : "Data" + " bus, address: " + address + ", data: " + instruction ? program[address] : data_file[address]
+        p "Sending data for #{instruction ? "Instruction" : "Data"} bus, address:" +
+          "#{address}, data: #{instruction ? program[address] : data_file[address]}"
       when 0x00               # write, doesn't support writing to instruction memory
         data = sp.getc
         data_file[address] = data
