@@ -89,10 +89,10 @@ begin
     type pattern_array is array (natural range <>) of pattern_type;
     constant patterns : pattern_array :=
 --     inst_add       recv_head   send_head   inst_data
-    ((x"000", x"81", x"00", x"83A7"),
-     (x"001", x"81", x"00", x"4F5E"),
-     (x"101", x"81", x"00", x"5937"),
-     (x"051", x"81", x"00", x"A8F2"));
+    ((x"52E", x"81", x"83", x"83A7"),
+     (x"96F", x"81", x"83", x"4F5E"),
+     (x"8F1", x"81", x"83", x"5937"),
+     (x"65A", x"81", x"83", x"A8F2"));
   begin
     wr <= '0';
     for i in patterns'range loop
