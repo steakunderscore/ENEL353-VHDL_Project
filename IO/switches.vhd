@@ -1,38 +1,17 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer:
--- 
--- Create Date:    16:08:33 09/15/2010
--- Design Name:
--- Module Name:    IO - Behavioral 
--- Project Name: 
--- Target Devices:
--- Tool versions: 
--- Description:
---
--- Dependencies:
---
--- Revision: Saturday 16 Oct 2010 by Sasha
--- Revision 0.01 - File Created
--- Additional Comments: 
+-- Module Name:    switch_io
+-- Description: Entity to control input from switches
+-- Authors: Tracy Jackson
+--          Sasha Wang
 --
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
---use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library work;
 use work.debounce;
 use work.switch_reg;
-use work.led_io;
-
-
-
----- Uncomment the following library declaration if instantiating
----- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity switch_io is
        PORT(
@@ -46,7 +25,6 @@ entity switch_io is
             clk         : IN            std_logic;
             sw1         : IN            std_logic;
             sw2         : IN            std_logic);
-            --leds      : OUT std_logic_vector(7 DOWNTO 0);
 end switch_io;
 
 architecture Behavioral of switch_io is
@@ -55,12 +33,10 @@ architecture Behavioral of switch_io is
 signal enable1                  : std_logic;
 signal switch1_connection   : std_logic;
 signal switch1_output       : std_logic;
---signal switch1_state      : std_logic;
 
 signal enable2                  : std_logic;
 signal switch2_connection   : std_logic;
 signal switch2_output       : std_logic;
---signal switch2_state      : std_logic;
 
 
 COMPONENT debounce
@@ -84,7 +60,6 @@ sw1_status: switch_reg PORT MAP(switch1_connection,clk, enable1, switch1_output)
 
 sw2_debouncer: debounce PORT MAP(clk, sw2,switch2_connection);
 sw2_status: switch_reg PORT MAP(switch2_connection,clk, enable2, switch2_output);
-
 
 
 PROCESS(clk,switch1_output,switch2_output, data_ack)
@@ -111,11 +86,6 @@ IF rising_edge(clk) THEN
     
 END IF;
 END PROCESS;
-
-
-
-
-
 
 
 PROCESS(clk, data_add, data_read)

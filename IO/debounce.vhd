@@ -1,20 +1,8 @@
 ----------------------------------------------------------------------------------
--- Company:
--- Engineer:
---
--- Create Date:    16:08:33 09/15/2010
--- Design Name:
--- Module Name:    IO - Behavioral
--- Project Name:
--- Target Devices:
--- Tool versions:
--- Description:
---
--- Dependencies:
---
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
+-- Module Name:    debounce
+-- Description: Entity to debounce a mechanical switch/button
+-- Authors: Tracy Jackson
+--          Sasha Wang
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -31,9 +19,9 @@ ENTITY debounce IS
 END debounce;
 
 ARCHITECTURE debounced_switch OF debounce IS
-	SIGNAL count : STD_LOGIC_VECTOR(2 DOWNTO 0);  --variable or signal???
-	
+    SIGNAL count : STD_LOGIC_VECTOR(2 DOWNTO 0);
 BEGIN
+     -- Debounce the switch using a counter
      PROCESS(clk, switch)
      BEGIN
           IF switch = '0' THEN

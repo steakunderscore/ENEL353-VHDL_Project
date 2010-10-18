@@ -1,20 +1,8 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer:
--- 
--- Create Date:    16:08:33 09/15/2010
--- Design Name:
--- Module Name:    IO - Behavioral 
--- Project Name: 
--- Target Devices:
--- Tool versions: 
--- Description:
---
--- Dependencies:
---
--- Revision: Saturday 16 Oct 2010 by Sasha
--- Revision 0.01 - File Created
--- Additional Comments: 
+-- Module Name:    IO
+-- Description: Entity to hangle IO
+-- Authors: Tracy Jackson
+--          Sasha Wang
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -43,9 +31,9 @@ entity IO is
                 data_req        : INOUT     std_logic;                              -- pulled low to request bus usage --
                 data_ack        : INOUT     std_logic;                              -- pulled high to inform request completion --
                 -- io --
-					clk         : IN            std_logic;
-					sw1         : IN            std_logic;
-					sw2         : IN            std_logic);
+                    clk         : IN            std_logic;
+                    sw1         : IN            std_logic;
+                    sw2         : IN            std_logic);
             --leds      : OUT std_logic_vector(7 DOWNTO 0);
 end IO;
 
