@@ -9,30 +9,33 @@ use work.mmu_types.all;
 
 entity inst_control_unit is
   port (
-     eoc          : in std_logic; -- High on muart has finished collecting data ??
-     eot          : in std_logic; -- High on muart has finished transmitting data.
-     ready        : in std_logic; -- ??
-     inst_req     : in std_logic; -- Low when the instruction address is valid and should be read.
-     write        : out std_logic; -- High to start muart writing data.
-     inst_or_data : out std_logic; -- High if current output packet is an instruction packet.
-     inst_ack     : out std_logic; -- Low when the inst is ready to be read by CPU. High otherwise.
-     muart_input  : out muart_input_state; -- State to multiplex the muart's input
-     muart_output : out muart_output_state; -- State to multiplex the muart's output.
-    clk    : in  std_logic
+     eoc          : in  std_logic; -- High on muart has finished collecting data
+     eot          : in  std_logic; -- High on muart has finished transmitting
+     ready        : in  std_logic; -- High if the muart is ready for new transfer
+     inst_req     : in  std_logic; -- Low to start a transfer
+     write        : out std_logic; -- Pulled high to start muart writing data
+     inst_or_data : out std_logic; -- Ouput headers inst or data bit
+     inst_ack     : out std_logic; -- Idles high, pulled low when data ready
+     muart_input  : out muart_input_state; -- Signal connected to muart input
+     muart_output : out muart_output_state; -- Signal connected to muart output
+     clk          : in  std_logic
   );
 end inst_control_unit;
 
 architecture inst_control_unit_arch of inst_control_unit is
-  type state_type is (idle, get_data, wait_clear);
-  type m_state_type is (idle,
-                        send_header,   send_add_high,   send_add_low,
-                        get_header,    get_add_high,    get_add_low,
-                        get_data_high, get_data_low,    finished);
-  type read_state_type is (idle, wait_data, read_data, pause, finished);
+  type m_state_type is (
+    idle,
+    send_header,   send_add_high, send_add_low,
+    get_header,    get_add_high,  get_add_low,
+    get_data_high, get_data_low,  finished
+  );
+  type state_type          is (idle, get_data, wait_clear);
+  type read_state_type     is (idle, wait_data, read_data, pause, finished);
   type transmit_state_type is (idle, set_data, trans_data, pause, finished);
-  signal state, next_state : state_type := idle;
-  signal get_state, next_get_state : m_state_type := idle;
-  signal reader_state, next_reader_state : read_state_type := idle;
+
+  signal state,             next_state             : state_type          := idle;
+  signal get_state,         next_get_state         : m_state_type        := idle;
+  signal reader_state,      next_reader_state      : read_state_type     := idle;
   signal transmitter_state, next_transmitter_state : transmit_state_type := idle;
 begin
   inst_fsm : process(state, inst_req, clk) begin
@@ -174,7 +177,12 @@ begin
     end if;
   end process read_fsm;
 
-  switch_states : process(clk, next_state, next_get_state, next_reader_state, next_transmitter_state) begin
+  switch_states : process(
+    clk, 
+    next_state, 
+    next_get_state, 
+    next_reader_state, 
+    next_transmitter_state) begin
     if rising_edge(clk) then
       state <= next_state;
       get_state <= next_get_state;
@@ -186,26 +194,27 @@ begin
   -- Outputs
   with state select
     inst_ack <= '1' when wait_clear,
-                       '0' when others;
+                '0' when others;
   
   with state select
     inst_or_data <= '0' when idle,
-                           '1' when others;
+                    '1' when others;
   
   with transmitter_state select
     write <= '1' when trans_data,
-                    '0' when others;
+             '0' when others;
   
 
-  muart_input <= idle          when transmitter_state /= set_data and transmitter_state /= trans_data else
-                        header        when get_state = send_header         else
-                        inst_add_high when get_state = send_add_high       else
-                        inst_add_low  when get_state = send_add_low        else
-                        idle;
+  muart_input <= idle          when transmitter_state /= set_data      else
+                 idle          when transmitter_state /= trans_data    else
+                 header        when get_state          = send_header   else
+                 inst_add_high when get_state          = send_add_high else
+                 inst_add_low  when get_state          = send_add_low  else
+                 idle;
   
-  muart_output <= idle           when reader_state /= read_data   else
-                         header         when get_state = get_header    else
-                         inst_data_high when get_state = get_data_high else
-                         inst_data_low  when get_state = get_data_low  else
-                         idle;
+  muart_output <= idle           when reader_state /= read_data     else
+                  header         when get_state     = get_header    else
+                  inst_data_high when get_state     = get_data_high else
+                  inst_data_low  when get_state     = get_data_low  else
+                  idle;
 end inst_control_unit_arch;
