@@ -12,7 +12,7 @@ all: alu_tb alu cpu IO microprocessor mmu
 
 .PHONY: cleanall
 cleanall: clean
-	rm -f alu_tb alu gpr_tb gpr pc spr_tb sr fulladder dulladder8_tb mmu_main mmu_tb *.cf *.lst
+	rm -f alu_tb alu gpr_tb gpr pc spr_tb sr fulladder fulladder8_tb mmu_main mmu_tb *.cf *.lst data_tb *.vcd cpu
 
 .PHONY: clean
 clean:
@@ -25,8 +25,8 @@ alu_tb: alu.o alu_tb.o
 alu: alu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
 
-cpu: cpu.o
-	$(GHDL) -e $(GHDLFLAGS) $@processor/cpu.vhd
+cpu: cpu.o cu.o alu.o gpr.o ar.o
+	$(GHDL) -e $(GHDLFLAGS) $@
 
 cu: cu.o
 	$(GHDL) -e $(GHDLFLAGS) $@
@@ -77,13 +77,16 @@ alu_tb.o: processor/alu_tb.vhd alu.o
 alu.o: processor/alu.vhd fulladder.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
+ar.o: processor/ar.vhd reg.o
+	$(GHDL) -a $(GHDLFLAGS) $<
+
 br_generator.o: mmu/muart/BRG.vhd
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 control_unit.o: mmu/control_unit.vhd mmu_types.o data_control_unit.o inst_control_unit.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
-cpu.o: processor/cpu.vhd
+cpu.o: processor/cpu.vhd alu.o ar.o cu.o gpr.o spr.o
 	$(GHDL) -a $(GHDLFLAGS) $<
 
 cu.o: processor/cu.vhd fulladder.o

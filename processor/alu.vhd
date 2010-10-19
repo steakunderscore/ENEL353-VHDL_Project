@@ -9,7 +9,7 @@ use ieee.std_logic_arith.all;
 
 
 library work;
-use work.fulladder8;
+--use work.fulladder8;
 --use work.cpu.ALL;
 
 -- Uncomment the following library declaration if using

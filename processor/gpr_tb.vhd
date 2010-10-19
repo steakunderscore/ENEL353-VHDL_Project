@@ -11,20 +11,32 @@ entity gpr_tb is
 architecture behav of gpr_tb is
   --  Declaration of the component that will be instantiated.
   component gpr
-  Port(clk                  : IN std_logic;                     -- Clock
-       enable               : IN std_logic;                     -- Enable input (output is always enabled)
-       SelRx, SelRy, SelRi  : IN std_logic_vector(2 DOWNTO 0);  -- Selecti which registers to use
-       Ri                   : IN std_logic_vector(7 DOWNTO 0);  -- Input
-       Rx, Ry               : OUT std_logic_vector(7 DOWNTO 0)); -- Outputs
+  Port (clk      : in   STD_LOGIC;
+        enable   : in   STD_LOGIC;
+        SelRx    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Rx output selection value
+        SelRy    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ry output selection value
+        SelRi    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ri input selection value
+        SelIn    : in   STD_LOGIC;  -- Select where the input should be from the CU or CDB
+        RiCU     : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Control Unit
+        RiCDB    : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Common Data Bus
+        Rx       : out  STD_LOGIC_VECTOR (7 downto 0);  -- The Rx output
+        Ry       : out  STD_LOGIC_VECTOR (7 downto 0)); -- The Ry output
   end component;
   --  Specifies which entity is bound with the component.
   for gpr_0: gpr use entity work.gpr;
-  signal clk, enable          : std_logic;
-  signal SelRx, SelRy, SelRi  : std_logic_vector(2 DOWNTO 0);
-  signal Ri, Rx, Ry           : std_logic_vector(7 DOWNTO 0);
+  signal clk                  : std_logic;
+  signal enable               : std_logic;
+  signal SelRx                : std_logic_vector(2 DOWNTO 0);
+  signal SelRy                : std_logic_vector(2 DOWNTO 0);
+  signal SelRi                : std_logic_vector(2 DOWNTO 0);
+  signal SelIn                : std_logic;
+  signal RiCU                 : STD_LOGIC_VECTOR(7 downto 0);  -- Input from the Control Unit
+  signal RiCDB                : STD_LOGIC_VECTOR(7 downto 0);  -- Input from the Common Data Bus
+  signal Rx                   : STD_LOGIC_VECTOR(7 downto 0);  -- The Rx output
+  signal Ry                   : STD_LOGIC_VECTOR(7 downto 0); -- The Ry output
 begin
   --  Component instantiation.
-  gpr_0: gpr port map (clk => clk, enable => enable, SelRx => SelRx, SelRy => SelRy, SelRi => SelRi, Ri => Ri, Rx => Rx, Ry => Ry);
+  gpr_0: gpr port map (clk => clk, enable => enable, SelRx => SelRx, SelRy => SelRy, SelRi => SelRi, SelIn => SelIn, RiCU => RiCU, RiCDB => RiCDB, Rx => Rx, Ry => Ry);
 
   -- Does the clock signal
   process
@@ -40,8 +52,9 @@ begin
   begin
 
     -- Write to R0
-    SelRi <= "000";
-    Ri <= "00010100";
+    SelIn <= '0'; --select the RiCU
+    SelRi <= "000"; --set the 0th register
+    RiCU <= "00010100";
     enable <= '1';
     wait for 20 ns;
 
@@ -60,7 +73,8 @@ begin
     wait for 20 ns;
 
     -- Change Ri (should not write as it is disabled)
-    Ri <= "00101010";
+    SelIn <= '1'; --select the RiCDB
+    RiCDB <= "00101010";
     wait for 20 ns;
     assert (Rx = "00010100") report "Wrote to register while disabled #1" severity error;
     assert (Ry = "00010100") report "Wrote to register while disabled #2" severity error;
@@ -73,7 +87,8 @@ begin
 
     -- Write to R2
     SelRi <= "010";
-    Ri <= "01010001";
+    SelIn <= '0'; --select the RiCU
+    RiCU <= "01010001";
     wait for 20 ns;
 
     -- Read R2 from Rx

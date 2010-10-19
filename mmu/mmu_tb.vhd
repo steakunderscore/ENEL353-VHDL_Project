@@ -119,7 +119,7 @@ begin
       
       wait until eoc'event;
       assert outp = "0000" & patterns(i).inst_add(11 downto 8)
-        report "Bad address high expected '" & str(patterns(i).inst_add(11 downto 8)) & "' recieved '" & str(outp) & "'"
+        report "Bad address high expected '" & str("0000" & patterns(i).inst_add(11 downto 8)) & "' recieved '" & str(outp) & "'"
         severity error;
       wait until eoc'event;
       

@@ -43,23 +43,23 @@ end cpu;
 
 architecture cpu_arch of cpu is
   component alu IS
-    Port (f   : in   STD_LOGIC_VECTOR (3 downto 0);  -- Function (opcode)
-          rx  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input x (Rx)
-          ry  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input y (Ry)
-          ro  : out  STD_LOGIC_VECTOR (7 downto 0);  -- Output Normaly (Ry)
-          Cin : in   STD_LOGIC;                      -- Carry in
-          sr  : out  STD_LOGIC_VECTOR (15 downto 0)); -- Status register out Z(0), C(1), N(2)
+  Port (f   : in   STD_LOGIC_VECTOR (3 downto 0);  -- Function (opcode)
+        rx  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input x (Rx)
+        ry  : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input y (Ry)
+        ro  : out  STD_LOGIC_VECTOR (7 downto 0);  -- Output Normaly (Ry)
+        Cin : in   STD_LOGIC;                      -- Carry in
+        sr  : out  STD_LOGIC_VECTOR (15 downto 0)); -- Status register out Z(0), C(1), N(2)
   END component;
   component ar is
-    Port (clk         : in   STD_LOGIC;
-          enable      : in   STD_LOGIC;
-          Sel8Bit     : in   STD_LOGIC;
-          SelHighByte : in   STD_LOGIC;
-          ByteInput   : in   STD_LOGIC_VECTOR (7 downto 0);
-          SelRi       : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
-          SelRo       : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
-          Ri          : in   STD_LOGIC_VECTOR (15 downto 0);  -- The input
-          Ro          : out  STD_LOGIC_VECTOR (15 downto 0)); -- The output
+  Port (clk         : in   STD_LOGIC;
+        enable      : in   STD_LOGIC;
+        Sel8Bit     : in   STD_LOGIC;
+        SelHighByte : in   STD_LOGIC;
+        ByteInput   : in   STD_LOGIC_VECTOR (7 downto 0);
+        SelRi       : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
+        SelRo       : in   STD_LOGIC_VECTOR (1 downto 0);   -- Select the address register
+        Ri          : in   STD_LOGIC_VECTOR (15 downto 0);  -- The input
+        Ro          : out  STD_LOGIC_VECTOR (15 downto 0)); -- The output
   END component;
   component cu IS
   Port (reset       : in STD_LOGIC;                       -- '0' for reset
@@ -96,8 +96,8 @@ architecture cpu_arch of cpu is
         ar_SelRo    : out STD_LOGIC_VECTOR (1 downto 0);  -- select AR out
         ar_Ri       : out STD_LOGIC_VECTOR (15 downto 0); -- input to AR
         ar_Ro       : in STD_LOGIC_VECTOR (15 downto 0);  -- output from AR
-        ar_sel8Bit  : out STD_LOGIC;                      -- only write half the AR
-        ar_selHByte : out STD_LOGIC;                      -- high or low half of the AR to write
+        ar_Sel8Bit  : out STD_LOGIC;                      -- only write half the AR
+        ar_SelHByte : out STD_LOGIC;                      -- high or low half of the AR to write
         ar_ByteIn   : out STD_LOGIC_VECTOR (7 downto 0);  -- 8 bit input to write half of AR
 
         -- Instruction memory
@@ -115,30 +115,30 @@ architecture cpu_arch of cpu is
         );
   END component;
   component gpr is
-    Port (clk      : in   STD_LOGIC;
-          enable   : in   STD_LOGIC;
-          SelRx    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Rx output selection value
-          SelRy    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ry output selection value
-          SelRi    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ri input selection value
-          SelIn    : in   STD_LOGIC;  -- Select where the input should be from the CU or CDB
-          RiCU     : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Control Unit
-          RiCDB    : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Common Data Bus
-          Rx       : out  STD_LOGIC_VECTOR (7 downto 0);  -- The Rx output
-          Ry       : out  STD_LOGIC_VECTOR (7 downto 0)); -- The Ry output
+  Port (clk      : in   STD_LOGIC;
+        enable   : in   STD_LOGIC;
+        SelRx    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Rx output selection value
+        SelRy    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ry output selection value
+        SelRi    : in   STD_LOGIC_VECTOR (2 downto 0);  -- The Ri input selection value
+        SelIn    : in   STD_LOGIC;  -- Select where the input should be from the CU or CDB
+        RiCU     : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Control Unit
+        RiCDB    : in   STD_LOGIC_VECTOR (7 downto 0);  -- Input from the Common Data Bus
+        Rx       : out  STD_LOGIC_VECTOR (7 downto 0);  -- The Rx output
+        Ry       : out  STD_LOGIC_VECTOR (7 downto 0)); -- The Ry output
   END component;
   component sr is
-    Port (clk      : in  STD_LOGIC;
-          enable   : in  STD_LOGIC;
-          reset    : in  STD_LOGIC;
-          Ri       : in  STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SR
-          Ro       : out STD_LOGIC_VECTOR (15 downto 0)); -- The output from SR
+  Port (clk      : in  STD_LOGIC;
+        enable   : in  STD_LOGIC;
+        reset    : in  STD_LOGIC;
+        Ri       : in  STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SR
+        Ro       : out STD_LOGIC_VECTOR (15 downto 0)); -- The output from SR
   END component;
   component pc is
-    Port (clk      : in  STD_LOGIC;
-          enable   : in  STD_LOGIC;
-          reset    : in  STD_LOGIC;
-          Ri       : in  STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SR
-          Ro       : out STD_LOGIC_VECTOR (15 downto 0)); -- The output from SR
+  Port (clk      : in  STD_LOGIC;
+        enable   : in  STD_LOGIC;
+        reset    : in  STD_LOGIC;
+        Ri       : in  STD_LOGIC_VECTOR (15 downto 0);  -- The input to the SR
+        Ro       : out STD_LOGIC_VECTOR (15 downto 0)); -- The output from SR
   END component;
   signal alu_Cin    : std_logic;
   signal alu_f      : std_logic_vector(3 downto 0);
@@ -155,8 +155,8 @@ architecture cpu_arch of cpu is
   signal ar_SelRo    : STD_LOGIC_VECTOR (1 downto 0);  -- select AR out
   signal ar_Ri       : STD_LOGIC_VECTOR (15 downto 0); -- input to AR
   signal ar_Ro       : STD_LOGIC_VECTOR (15 downto 0);  -- output from AR
-  signal ar_sel8Bit  : STD_LOGIC;                      -- only write half the AR
-  signal ar_selHByte : STD_LOGIC;                      -- high or low half of the AR to write
+  signal ar_Sel8Bit  : STD_LOGIC;                      -- only write half the AR
+  signal ar_SelHByte : STD_LOGIC;                      -- high or low half of the AR to write
   signal ar_ByteIn   : STD_LOGIC_VECTOR (7 downto 0);  -- 8 bit input to write half of AR
 
   signal pc_reset   : std_logic;
@@ -215,8 +215,8 @@ begin
             ar_en       => ar_enable,   -- enable write to AR
             ar_SelRi    => ar_SelRi,    -- select AR in
             ar_SelRo    => ar_SelRo,    -- select AR out
-            ar_sel8Bit  => ar_sel8Bit,
-            ar_selHByte => ar_selHByte,
+            ar_Sel8Bit  => ar_Sel8Bit,
+            ar_SelHByte => ar_SelHByte,
             ar_ByteIn   => ar_ByteIn,
             ar_Ri       => ar_Ri,       -- input to AR
             ar_Ro       => ar_Ro,       -- output from AR
@@ -237,7 +237,7 @@ begin
             clk         => clk,
             enable      => ar_enable,
             Sel8Bit     => ar_Sel8Bit,
-            SelHighByte => ar_selHByte,
+            SelHighByte => ar_SelHByte,
             ByteInput   => ar_ByteIn,
             SelRi       => ar_SelRi,
             SelRo       => ar_SelRo,
