@@ -215,8 +215,7 @@ begin
     write <= '1' when trans_data,
                     '0' when others;
   
-  muart_input <= idle          when transmitter_state /= set_data      else
-                 idle          when transmitter_state /= trans_data    else
+  muart_input <= idle          when transmitter_state /= set_data and transmitter_state /= trans_data    else
                  header        when get_state          = send_header   else
                  data_add_high when get_state          = send_add_high else
                  data_add_low  when get_state          = send_add_low  else
